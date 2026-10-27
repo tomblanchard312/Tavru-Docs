@@ -1,6 +1,6 @@
 # Upstream integration
 
-> **Last updated:** 2026-10-26 · **Status:** integration validated locally; all eight CI gates pass after the font/pagination test follow-up.
+> **Last updated:** 2026-10-26 · **Status:** integration validated locally; all eight CI gates pass after the font/pagination test follow-up and upstream refresh.
 
 This integration brings WordCraft `438775ce` into Nisaba, starting from `fa787519`.
 At the recorded upstream tip, Nisaba was 296 commits behind and 12 ahead. The existing local
@@ -63,9 +63,21 @@ and enough text to span pages, retaining all last-line/next-line boundary assert
 zero failed, seven existing ignored**), interface audit, doctests, assets, layers and WASM.
 These are test-only corrections; production rendering behavior and parity estimates are unchanged.
 
+## Upstream refresh
+
+On 2026-10-26, fetched and merged the four commits added after upstream `2c99a427`, through
+`02120c84` (merge commit `3abf9321`). Upstream's `tests_linear.rs` import fix overlapped local
+changes; the merged test keeps its explicit imports and the local deterministic `proof_text`
+step-count regression check, with matching instrumentation in `para.rs`.
+
+`cargo xtask ci` passes all eight gates on this Linux host when bindgen is given GCC 13's include
+directory (`BINDGEN_EXTRA_CLANG_ARGS=-I/usr/lib/gcc/x86_64-linux-gnu/13/include`). The optional
+translation report is skipped because the `craft-i18n` catalog checkout is not installed.
+
 ## Revision history
 
 | Date | Change |
 |---|---|
+| 2026-10-26 | Refresh through upstream `02120c84`; all eight local CI gates pass. |
 | 2026-10-26 | Resolve inherited test assumptions; full CI passes without disabling Thai. |
 | 2026-10-26 | Record upstream integration, recoverable checkpoint, resolutions and local validation results. |

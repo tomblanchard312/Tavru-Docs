@@ -71,6 +71,9 @@ Source that cannot be encoded in the existing project’s code page is refused w
 
 ## Clean-room compatibility
 
+See the [implementation provenance record](implementation-provenance.md) for
+public references, the targeted inspection findings and their limits.
+
 The implementation and assets are original. Interoperability work uses published specifications and documented Word APIs, with synthetic source and document fixtures. No Microsoft application code or assets are imported. File preservation and macro execution compatibility are separate: the current transpiler/object model still has the limitations listed in [the VBA README](../vba/README.md).
 
 Format references: [MS-OVBA](https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-ovba/ef7087ac-3974-4452-aab2-7dba2214d239) and [MS-CFB](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cfb/53989ce4-7b05-4f8d-829b-d08d6148375b). Synthetic round-trip tests cover source replacement, adding standard modules, preserved opaque records/designers/OLE metadata and encoding refusal. Native Microsoft Word execution and repair-free round trips have not been validated.
