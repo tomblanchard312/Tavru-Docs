@@ -7,12 +7,12 @@ Scribe suggests rewrites and new text using a language model that runs on the us
 Scribe’s blue folded-page S and wedge-cut reed icon is embedded in the Review ribbon and the
 assistant pane. The original transparent artwork is recorded in [ATTRIBUTION.md](../ATTRIBUTION.md).
 
-Scribe runs GGUF chat models directly in Nisaba using llama.cpp on the CPU. Download a catalog model or choose a local model file to get started. The assistant name remains `wordcraft_brand::ASSISTANT_NAME`.
+Scribe asks the Enki daemon (`sharedai-daemon`) to run a GGUF chat model. Nisaba does not link llama.cpp. Download Phi-4 mini or choose a local model file to get started. The assistant name remains `wordcraft_brand::ASSISTANT_NAME`.
 
 ## Using it
 
 1. Choose **Review › Scribe**. The first time, Nisaba lists its local model files in the background ("Starting Scribe…").
-2. With no model yet, the pane says "Scribe needs a language model before it can write" and offers **Choose Model File…**. Choose a GGUF chat model compatible with the bundled runtime, or download a catalog model under **Settings**. Nisaba copies the file into its models folder (`~/.local/share/nisaba/models`, private to the user), and selects it. Existing copied GGUF models appear automatically.
+2. With no model yet, the pane says "Scribe needs a language model before it can write" and offers **Download Phi-4 mini** (about 2.5 GB, MIT). That is the default. Nisaba checks the pinned SHA-256 and keeps the file in its models folder (`~/.local/share/nisaba/models`, private to the user), then selects it. **Choose Model File…** and the other catalog models under **Settings** are still available. If Phi-4 mini is already there, Scribe selects it ahead of other files unless a model was chosen already.
 3. Select some text and choose **Improve**, **Shorten**, **Fix grammar** or **More formal**, or type a request and choose **Send** (Ctrl+Enter, or Cmd+Enter on macOS). **Continue** writes a concise next paragraph after the selection, or uses text before the document caret when nothing is selected. On an empty body paragraph it can use the previous paragraph.
 4. The final answer streams into the pane; internal reasoning prefixes are withheld. **Stop** ends generation. Stopped, failed, empty or length-limited results cannot be applied; visible draft text can still be copied.
 5. **Replace** swaps the selection for the suggestion, **Insert** adds it after the selection, **Copy** puts it on the clipboard and **Discard** drops it.
@@ -23,15 +23,15 @@ Model selection, downloads and file import are grouped under **Settings**. Routi
 
 ## Downloading models
 
-Like FileExplorer, **Download a model** lists fixed models with their size, license and Hugging Face page. Qwen3 4B, Gemma 3 4B, Phi-4 mini and Llama 3.2 3B are pinned to exact revisions, sizes and SHA-256 hashes. Downloading shows progress and supports Cancel; only a verified file is installed and selected. Incomplete downloads restart from the beginning. Catalog models are checked again before inference.
+Like FileExplorer, **Download a model** lists fixed models with their size, license and Hugging Face page. Phi-4 mini is the default. Qwen3 4B, Gemma 3 4B, and Llama 3.2 3B are also pinned to exact revisions, sizes and SHA-256 hashes. Downloading shows progress and supports Cancel; only a verified file is installed and selected. Incomplete downloads restart from the beginning. Catalog models are checked again before inference.
 
 For a gated repository, accept its access terms on Hugging Face and enter a read token. It is held only for the download, never saved; `HF_TOKEN` is also supported. Flatpak builds allow network access for these downloads. Inference stays local. Llama 4 is not in the small-model catalog.
 
 ## Local inference
 
-Models stay in the app's data folder. Inference runs on a worker thread with an 8,192-token context, at most 1,024 generated tokens per UI request and a six-minute decode limit. Stop is checked between prompt batches and generated tokens; loading a model and native decode calls must finish before cancellation takes effect. Models are loaded for each request and released afterward.
+Models stay in the app's data folder. Each request is sent to the per-user Enki daemon, which Nisaba starts when it is not already listening (`sharedai-daemon` beside the app, in `SHAREDAI_DAEMON`, in `SHAREDAI_BIN_DIR`, or on `PATH`, with `sharedai-worker` beside the daemon). The daemon registers the selected file and streams the reply. Stop cancels that request. Loading can take the first few minutes of a request; each later chunk waits up to a minute.
 
-Old socket preferences remain readable for compatibility and are ignored. Previously registered models outside Nisaba's models folder must be chosen again. Browser builds keep the assistant disabled.
+Old socket preferences remain readable for compatibility. The socket is the daemon's own endpoint, not a setting Scribe edits. Previously registered models outside Nisaba's models folder must be chosen again. Browser builds keep the assistant disabled.
 
 ## For scripts and agents
 
@@ -67,12 +67,13 @@ These are local headless UI/runtime checks, not native GUI or cross-platform acc
 - `crates/engine/src/cmd/assistant.rs`: settings and tracked-change application.
 - `crates/ui-egui/src/assistant_pane.rs`: local model discovery, import, streaming and cancellation on worker threads.
 
-Not yet: GPU acceleration, model caching between requests or conversation history.
+The daemon keeps a loaded model between requests. Not yet: GPU acceleration, or conversation history beyond the messages Scribe sends.
 
 ## Revision history
 
 | Date | Change |
 |---|---|
+| 2026-10-28 | Scribe and Developer ask the Enki daemon for chat and completion. Nisaba no longer links llama.cpp. |
 | 2026-10-26 | Embedded the approved blue S/reed-tip icon, cached per UI context; inspected light/dark headless renders. |
 | 2026-10-26 | Guarded stale/partial suggestions and oversized selections; separated source data in prompts, added concise caret continuation, grouped model setup in Settings and verified real writing/review flows. |
 | 2026-10-25 | Replaced the daemon dependency with in-process CPU GGUF inference and a checksum-pinned Hugging Face download catalog. |

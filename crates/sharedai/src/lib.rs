@@ -1,5 +1,5 @@
-//! A small, blocking client for the [SharedAI](https://github.com/tomblanchard312/SharedAI)
-//! daemon: list its models and stream a chat reply.
+//! A small, blocking client for the Enki daemon (`sharedai-daemon`): list its models and stream a
+//! chat reply. Nisaba does not link llama.cpp; the daemon's worker does.
 //!
 //! SharedAI runs models on the user's own machine. Its wire contract (docs/INFERENCE.md there) is
 //! newline-delimited JSON over a private Unix socket: negotiate a protocol version, send one
@@ -11,7 +11,7 @@
 //! [`Error::Unsupported`].
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
-/// In-process GGUF inference used by the desktop assistant.
+/// GGUF file checks. Chat runs through [`chat_file`].
 pub mod local;
 /// Pinned assistant models and verified downloads.
 pub mod models;
@@ -303,6 +303,48 @@ pub fn model_id(path: &std::path::Path) -> String {
     if id.is_empty() { "model".into() } else { id }
 }
 
+/// Chat with the GGUF file at `path` through the Enki daemon.
+///
+/// Starts `sharedai-daemon` when nothing is listening, registers the file, and streams the reply.
+/// A catalog model is refused when its bytes do not match the pinned checksum. The file path is
+/// what Scribe stores; the daemon is asked for that file's registry id.
+pub fn chat_file(path: &str, messages: &[Message], params: &Params, cancel: &AtomicBool, on_chunk: impl FnMut(&str)) -> Result<Summary, Error> {
+    if messages.len() > MAX_MESSAGES
+        || messages.iter().try_fold(0usize, |sum, m| sum.checked_add(m.content.len())?.checked_add(m.role.len())).is_none_or(|n| n > 128 * 1024)
+    {
+        return Err(Error::Invalid("Message too large".into()));
+    }
+    if cancel.load(Ordering::Relaxed) {
+        return Err(Error::Cancelled);
+    }
+    let file = std::path::Path::new(path);
+    local::validate_model(file)?;
+    let file = file.canonicalize()?;
+    let (size, sha256) = hash_file(&file)?;
+    let license = if let Some(spec) = models::CATALOG.iter().find(|m| file.file_name().is_some_and(|name| name == m.file)) {
+        if size != spec.size || sha256 != spec.sha256 {
+            return Err(Error::Invalid("The model checksum does not match. Download it again.".into()));
+        }
+        spec.license
+    } else {
+        "unknown"
+    };
+    #[cfg(not(unix))]
+    {
+        let _ = (params, on_chunk, size, sha256, license);
+        return Err(Error::Unsupported);
+    }
+    #[cfg(unix)]
+    {
+        let endpoint = endpoint("")?;
+        ensure_running(&endpoint, Some(&endpoint))?;
+        let size = i64::try_from(size).map_err(|_| Error::Invalid("the model file is too large".into()))?;
+        let id = model_id(&file);
+        net::register_known(&endpoint, "nisaba", &id, &file, size, &sha256, license)?;
+        chat(&endpoint, "nisaba", &id, messages, params, Timeouts::default(), cancel, on_chunk)
+    }
+}
+
 /// Size and lowercase hex SHA-256 of a file, read in 1 MiB pieces.
 pub fn hash_file(path: &std::path::Path) -> Result<(u64, String), Error> {
     use sha2::{Digest, Sha256};
@@ -323,12 +365,18 @@ pub fn hash_file(path: &std::path::Path) -> Result<(u64, String), Error> {
     Ok((size, hex))
 }
 
-/// Where to find `sharedai-daemon`: `SHAREDAI_DAEMON`; then the program's private helper folder,
+/// Where to find `sharedai-daemon`: `SHAREDAI_DAEMON`, then `SHAREDAI_BIN_DIR`, then the program's private helper folder,
 /// `<prefix>/lib/<program>/` (how Nisaba's packages ship it: `/usr/bin/nisaba` looks in
 /// `/usr/lib/nisaba/`); then next to the program (a cargo build); then each `PATH` directory.
 pub fn find_daemon() -> Option<std::path::PathBuf> {
     if let Some(p) = std::env::var_os("SHAREDAI_DAEMON").filter(|p| !p.is_empty()) {
         return Some(p.into()).filter(|p: &std::path::PathBuf| p.is_file());
+    }
+    if let Some(dir) = std::env::var_os("SHAREDAI_BIN_DIR").filter(|p| !p.is_empty()) {
+        let bundled = std::path::PathBuf::from(dir).join("sharedai-daemon");
+        if bundled.is_file() {
+            return Some(bundled);
+        }
     }
     let exe = std::env::current_exe().ok();
     let candidates = daemon_candidates(exe.as_deref(), std::env::var_os("PATH").as_deref());
@@ -420,13 +468,17 @@ mod net {
     pub fn register_file(endpoint: &Path, app: &str, id: &str, path: &Path) -> Result<(), Error> {
         let (size, sha256) = hash_file(path)?;
         let size = i64::try_from(size).map_err(|_| Error::Invalid("the model file is too large".into()))?;
+        register_known(endpoint, app, id, path, size, &sha256, "unknown")
+    }
+
+    pub(crate) fn register_known(endpoint: &Path, app: &str, id: &str, path: &Path, size: i64, sha256: &str, license: &str) -> Result<(), Error> {
         let model = json!({
             "id": id,
             "path": path.to_string_lossy(),
             "sha256": sha256,
             "size_bytes": size,
             "source": "local-file",
-            "license": "unknown",
+            "license": license,
         });
         let mut reader = connect(endpoint, app, VERSION_BASE)?;
         reader.inner.write_all(&encode(&json!({"type": "register_models", "models": [model]}), MAX_FRAME_V1)?)?;

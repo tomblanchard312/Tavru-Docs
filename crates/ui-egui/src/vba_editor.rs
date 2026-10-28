@@ -469,7 +469,7 @@ fn complete(app: &mut WordApp, index: usize) -> Result<Value, String> {
     app.vba.completion = None;
     app.vba.job = Some(spawn(move |cancel| {
         let mut out = String::new();
-        wordcraft_sharedai::local::chat(
+        wordcraft_sharedai::chat_file(
             &path.to_string_lossy(),
             &messages,
             &wordcraft_sharedai::Params { max_tokens: Some(256), temperature: Some(0.0), seed: Some(42) },
