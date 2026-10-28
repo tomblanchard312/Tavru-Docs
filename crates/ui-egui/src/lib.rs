@@ -62,6 +62,7 @@ pub mod guides;
 pub mod i18n;
 pub mod ibeam;
 pub mod icons;
+mod image_gen;
 pub mod ink;
 pub mod keys;
 pub mod keytips;
@@ -101,6 +102,8 @@ use wordcraft_engine::Session;
 
 pub use control::ControlRequest;
 pub use file_dialogs::{FileDialogAnswer, FileDialogRequest, open_filters};
+#[cfg(not(target_arch = "wasm32"))]
+pub use image_gen::warm_default_image_model;
 
 /// Platform services injected by the host (file dialogs, file I/O).
 #[derive(Default)]
@@ -594,6 +597,8 @@ pub struct WordApp {
     pub restrict: dialogs_review::RestrictPane,
     /// Review › Assistant: the SharedAI request in flight and its reply.
     pub assistant: assistant_pane::State,
+    /// Insert › Generate: an image, a logo, or a generative expand.
+    pub image_gen: image_gen::State,
     pub vba: vba_editor::State,
     pub status_msg: Option<(String, f64)>,
     pub previews: previews::Previews,
@@ -844,6 +849,7 @@ impl WordApp {
             printing: Default::default(),
             print_feedback_seen: None,
             assistant: Default::default(),
+            image_gen: Default::default(),
             vba: Default::default(),
             integrated_titlebar: false,
             mac_titlebar: chrome::MacTitleBar::default(),
@@ -1065,6 +1071,14 @@ impl WordApp {
     /// Close, Envelopes, Labels and Finish & Merge on a document with unsaved changes first ask
     /// Save / Don't Save / Cancel, and the command runs once that is answered (`ui.saveChanges`).
     pub fn run(&mut self, id: &str, params: Value) -> Result<Value, String> {
+        if id == "ui.imageGen" {
+            if !self.has_document() {
+                return Err("Open a document first".into());
+            }
+            let task = params.get("task").and_then(Value::as_str).unwrap_or("image");
+            image_gen::open(self, task);
+            return Ok(json!({}));
+        }
         // Comment text still being typed is written first, so a save or export has it and a
         // close, New or Open counts it as a change (#1348). A draft the document refuses is not
         // part of it: saving and exporting go on without it (the refusal stays on the status

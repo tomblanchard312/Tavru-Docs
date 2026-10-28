@@ -60,6 +60,11 @@ pub const CATALOG: &[Model] = &[
     },
 ];
 
+/// Phi-4 mini is Scribe's default. The VBA editor uses the same file.
+pub fn scribe_default() -> Option<&'static Model> {
+    CATALOG.iter().find(|model| model.id == "phi4-mini")
+}
+
 pub fn verify(spec: &Model, path: &Path) -> Result<(), Error> {
     if std::fs::metadata(path)?.len() != spec.size {
         return Err(Error::Invalid("The model size does not match. Download it again.".into()));
@@ -206,5 +211,8 @@ mod tests {
             assert!(!model.file.contains('/') && !model.file.contains(".."));
             assert!(model.size > 0 && !model.license.is_empty());
         }
+        let phi = scribe_default().unwrap();
+        assert_eq!(phi.license, "MIT");
+        assert_eq!(phi.file, "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf");
     }
 }

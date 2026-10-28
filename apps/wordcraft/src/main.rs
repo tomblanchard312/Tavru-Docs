@@ -458,6 +458,7 @@ fn main() -> eframe::Result {
             let mut session = Session::new(doc);
             session.system_region = region;
             let mut app = WordApp::new(session, services(file_dialog, &cc.egui_ctx));
+            wordcraft_ui_egui::warm_default_image_model();
             app.set_startup_update_check(true);
             load_prefs(&mut app);
             load_user_dictionary(&mut app);
