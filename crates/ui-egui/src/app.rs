@@ -150,6 +150,7 @@ impl WordApp {
             status_msg,
             previews,
             assistant: Default::default(),
+            image_gen: Default::default(),
             vba: Default::default(),
             change_picture_target,
             recipient_list_pending,

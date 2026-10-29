@@ -469,7 +469,7 @@ fn complete(app: &mut WordApp, index: usize) -> Result<Value, String> {
     app.vba.completion = None;
     app.vba.job = Some(spawn(move |cancel| {
         let mut out = String::new();
-        wordcraft_sharedai::local::chat(
+        wordcraft_sharedai::chat_file(
             &path.to_string_lossy(),
             &messages,
             &wordcraft_sharedai::Params { max_tokens: Some(256), temperature: Some(0.0), seed: Some(42) },
@@ -762,7 +762,7 @@ fn editor(app: &mut WordApp, ui: &mut Ui) {
     } else {
         let mut picked = app.vba.selected;
         let selected = app.vba.modules.get(picked).map(|m| format!("{}{}", m.name, if m.dirty() { " *" } else { "" })).unwrap_or_default();
-        egui::ComboBox::from_id_salt("vba_module").selected_text(selected).show_ui(ui, |ui| {
+        craft_ui::ComboBox::from_id_salt("vba_module").selected_text(selected).show_ui(ui, |ui| {
             for (i, m) in app.vba.modules.iter().enumerate() {
                 ui.selectable_value(&mut picked, i, format!("{}{}", m.name, if m.dirty() { " *" } else { "" }));
             }

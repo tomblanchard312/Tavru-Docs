@@ -198,11 +198,8 @@ impl State {
                         Ok(m) => {
                             self.unavailable = false;
                             self.status.clear();
-                            if !m.iter().any(|x| x == prefs_model)
-                                && !Path::new(prefs_model).is_file()
-                                && let Some(first) = m.first()
-                            {
-                                chosen = Some(first.clone());
+                            if !m.iter().any(|x| x == prefs_model) && !Path::new(prefs_model).is_file() {
+                                chosen = preferred_model(&m);
                             }
                             self.models = m;
                         }
@@ -271,7 +268,7 @@ pub fn friendly(e: &wordcraft_sharedai::Error) -> String {
         E::Busy { .. } => f(tl!("{name} is busy. Try again in a moment.")),
         E::Timeout => f(tl!("{name} stopped responding. Try again.")),
         E::Unsupported => f(tl!("{name} isn't available on this system.")),
-        E::NotInstalled => f(tl!("{name} isn't installed with this copy of Nisaba.")),
+        E::NotInstalled => f(tl!("{name} isn't installed with this copy of DraftHearth.")),
         E::Incompatible => f(tl!("{name} needs an update.")),
         E::Invalid(_) => f(tl!("{name} couldn't take that request.")),
         E::Registry(_) => tl!("That model couldn't be added.").to_string(),
@@ -286,8 +283,7 @@ pub fn friendly(e: &wordcraft_sharedai::Error) -> String {
     }
 }
 
-/// Where added model files are kept: `$XDG_DATA_HOME/nisaba/models` (inside a Flatpak, the app's
-/// own data folder).
+/// Where added and downloaded model files are kept.
 pub(crate) fn models_dir() -> Option<PathBuf> {
     let env = |name: &str| std::env::var_os(name).map(PathBuf::from).filter(|p| p.is_absolute());
     if cfg!(target_os = "windows") {
@@ -296,7 +292,11 @@ pub(crate) fn models_dir() -> Option<PathBuf> {
     if cfg!(target_os = "macos") {
         return Some(env("HOME")?.join("Library/Application Support").join(wordcraft_brand::SETTINGS_DIR).join("Models"));
     }
-    let data = env("XDG_DATA_HOME").or_else(|| env("HOME").map(|h| h.join(".local/share")))?;
+    let data = if env("FLATPAK_ID").is_some() {
+        env("HOME")?.join(".local/share")
+    } else {
+        env("XDG_DATA_HOME").or_else(|| env("HOME").map(|h| h.join(".local/share")))?
+    };
     Some(data.join(wordcraft_brand::SETTINGS_DIR_XDG).join("models"))
 }
 
@@ -357,7 +357,7 @@ fn refresh_models(app: &mut WordApp) {
     }
 }
 
-/// Add the model file at `path`: copy it into Nisaba's models folder and select it. Runs in the background; the pane reports when it's ready. Used by
+/// Add the model file at `path`: copy it into DraftHearth's models folder and select it. Runs in the background; the pane reports when it's ready. Used by
 /// the pane's Choose Model File… and by `ui.assistant.addModel {path}`.
 pub fn add_model(app: &mut WordApp, path: &str) -> Result<Value, String> {
     if app.assistant.job.is_some() {
@@ -415,6 +415,9 @@ fn model_downloads(app: &mut WordApp, ui: &mut Ui, busy: bool) {
         for model in wordcraft_sharedai::models::CATALOG {
             ui.group(|ui| {
                 ui.label(format!("{} · {:.1} GB · {}", model.name, model.size as f64 / 1_000_000_000.0, model.license));
+                if wordcraft_sharedai::models::scribe_default().is_some_and(|d| d.id == model.id) {
+                    ui.label(tl!("Default for Scribe"));
+                }
                 ui.hyperlink_to(tl!("Model and license"), format!("https://huggingface.co/{}", model.repo));
                 let installed = models_dir().map(|d| d.join(model.file)).is_some_and(|p| p.is_file());
                 if installed {
@@ -442,7 +445,26 @@ fn model_downloads(app: &mut WordApp, ui: &mut Ui, busy: bool) {
 }
 
 fn choose_model_file(app: &mut WordApp) {
-    let _ = app.ask_file(crate::file_dialogs::FileDialogRequest::Open { purpose: "model".into() }, crate::file_dialogs::AfterPick::AssistantModel);
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let request = crate::file_dialogs::FileDialogRequest::Open { purpose: "model".into() };
+        let after = crate::file_dialogs::AfterPick::AssistantModel;
+        if app.services.file_dialog.is_some() || app.services.pick_open.is_some() {
+            let _ = app.ask_file(request, after);
+        } else {
+            app.show_file_browser(request, after, false);
+        }
+    }
+    #[cfg(target_arch = "wasm32")]
+    {
+        app.assistant.status = crate::i18n::fmt(tl!("{name} needs the desktop app."), &[("name", NAME)]);
+    }
+}
+
+/// Phi-4 mini when it is installed, otherwise the first local file.
+fn preferred_model(models: &[String]) -> Option<String> {
+    let phi = wordcraft_sharedai::models::scribe_default().map(|model| model.file);
+    models.iter().find(|path| phi.is_some_and(|file| path.rsplit(['/', '\\']).next() == Some(file))).or_else(|| models.first()).cloned()
 }
 
 fn continue_context(app: &WordApp) -> String {
@@ -488,7 +510,7 @@ fn ask(app: &mut WordApp, action: Option<Action>) -> Result<Value, String> {
     let msgs = messages(action, &app.assistant.prompt, &text);
     let job = spawn(Work::Writing, move |tx, cancel| {
         let chunks = tx.clone();
-        let r = wordcraft_sharedai::local::chat(
+        let r = wordcraft_sharedai::chat_file(
             &model,
             &msgs,
             &wordcraft_sharedai::Params {
@@ -654,7 +676,7 @@ pub fn pane(app: &mut WordApp, ui: &mut Ui) {
             ui.horizontal(|ui| {
                 ui.label(tl!("Model"));
                 let mut model = app.session.prefs.assistant_model.clone();
-                egui::ComboBox::from_id_salt("assistant_model").selected_text(model.clone()).show_ui(ui, |ui| {
+                craft_ui::ComboBox::from_id_salt("assistant_model").selected_text(model.clone()).show_ui(ui, |ui| {
                     for m in &app.assistant.models {
                         ui.selectable_value(&mut model, m.clone(), m);
                     }
@@ -666,7 +688,7 @@ pub fn pane(app: &mut WordApp, ui: &mut Ui) {
             ui.add_space(6.0);
         }
 
-        if ui.add_enabled(!busy, egui::Button::new(tl!("Choose Model File…"))).clicked() {
+        if ui.add_enabled(!busy && !cfg!(target_arch = "wasm32"), egui::Button::new(tl!("Choose Model File…"))).clicked() {
             choose_model_file(app);
         }
     });
@@ -706,11 +728,17 @@ pub fn pane(app: &mut WordApp, ui: &mut Ui) {
     if app.assistant.listed && app.assistant.models.is_empty() {
         ui.label(crate::i18n::fmt(tl!("{name} needs a language model before it can write."), &[("name", NAME)]));
         ui.add_space(6.0);
-        if ui.button(tl!("Choose Model File…")).clicked() {
+        if let Some(model) = wordcraft_sharedai::models::scribe_default()
+            && ui.add_enabled(!busy, egui::Button::new(tl!("Download Phi-4 mini"))).clicked()
+            && let Err(e) = download_model(app, model.id)
+        {
+            app.assistant.status = e;
+        }
+        ui.label(egui::RichText::new(tl!("Phi-4 mini is the default. About 2.5 GB, MIT license. It stays on this computer.")).small().weak());
+        ui.add_space(4.0);
+        if ui.add_enabled(!busy && !cfg!(target_arch = "wasm32"), egui::Button::new(tl!("Choose Model File…"))).clicked() {
             choose_model_file(app);
         }
-        ui.add_space(4.0);
-        ui.label(egui::RichText::new(tl!("Choose a compatible GGUF chat model, or download one in Settings.")).small().weak());
         if !app.assistant.status.is_empty() {
             ui.add_space(4.0);
             ui.label(egui::RichText::new(app.assistant.status.as_str()).small());
@@ -803,6 +831,28 @@ mod tests {
     fn app(text: &str) -> WordApp {
         WordApp::new(wordcraft_engine::Session::new(wordcraft_doc::Document::from_text(text)), crate::Services::default())
     }
+    #[test]
+    #[cfg(not(target_arch = "wasm32"))]
+    fn choosing_a_model_opens_the_desktop_model_browser() {
+        let mut app = app("test");
+        assert!(app.file_browser.open.is_none());
+        choose_model_file(&mut app);
+        assert!(app.file_browser.open.is_some());
+    }
+
+    #[test]
+    fn choosing_a_model_uses_the_host_picker_before_the_builtin_browser() {
+        let mut app = app("test");
+        app.services.file_dialog = Some(Box::new(|request| {
+            assert!(matches!(request, crate::file_dialogs::FileDialogRequest::Open { purpose } if purpose == "model"));
+            let (tx, rx) = std::sync::mpsc::channel();
+            tx.send(Ok(vec![])).unwrap();
+            rx
+        }));
+        choose_model_file(&mut app);
+        assert!(app.file_browser.open.is_none());
+    }
+
     fn suggestion(app: &mut WordApp, text: &str, paragraph: bool) {
         app.assistant.origin = Some(Origin {
             doc: (app.session.document_id(), app.session.rev()),
@@ -880,6 +930,13 @@ mod tests {
         a.session.run("review.acceptAll", &json!({})).unwrap();
         assert_eq!(a.session.doc.plain_text(wordcraft_doc::StoryRef::Body).trim(), "Beginning.\nNext paragraph.");
     }
+    #[test]
+    fn phi4_is_chosen_ahead_of_other_local_models() {
+        let models = vec!["/m/a.gguf".into(), "/m/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf".into()];
+        assert_eq!(preferred_model(&models).as_deref(), Some("/m/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf"));
+        assert_eq!(preferred_model(&["/m/a.gguf".into()]).as_deref(), Some("/m/a.gguf"));
+    }
+
     #[test]
     fn discovery_keeps_an_explicit_existing_external_path() {
         let external = std::env::current_exe().unwrap();

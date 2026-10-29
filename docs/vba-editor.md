@@ -1,6 +1,6 @@
 # VBA code editor
 
-> **Last updated:** 2026-10-26 · **Status:** desktop VBA workspace with project explorer, document designer, contextual chat and separate Phi-4 completion; GUI macro execution remains open.
+> **Last updated:** 2026-10-28 · **Status:** desktop VBA workspace with project explorer, document designer, contextual chat and separate local completion; GUI macro execution remains open.
 
 Open **Developer › Code Editor** (Alt+F11). The resizable editor stays beside the live document. Open a UTF-8 `.bas` or `.cls` file, choose **Document modules** to read the current document's embedded VBA project, or choose **New module**. The module selector marks unsaved source with `*`.
 
@@ -71,6 +71,9 @@ Source that cannot be encoded in the existing project’s code page is refused w
 
 ## Clean-room compatibility
 
+See the [implementation provenance record](implementation-provenance.md) for
+public references, the targeted inspection findings and their limits.
+
 The implementation and assets are original. Interoperability work uses published specifications and documented Word APIs, with synthetic source and document fixtures. No Microsoft application code or assets are imported. File preservation and macro execution compatibility are separate: the current transpiler/object model still has the limitations listed in [the VBA README](../vba/README.md).
 
 Format references: [MS-OVBA](https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-ovba/ef7087ac-3974-4452-aab2-7dba2214d239) and [MS-CFB](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cfb/53989ce4-7b05-4f8d-829b-d08d6148375b). Synthetic round-trip tests cover source replacement, adding standard modules, preserved opaque records/designers/OLE metadata and encoding refusal. Native Microsoft Word execution and repair-free round trips have not been validated.
@@ -93,7 +96,7 @@ Format references: [MS-OVBA](https://learn.microsoft.com/en-us/openspecs/office_
 
 - Real local Phi-4 mini completion generated an expression, inserted it at the requested code caret, and the resulting VBA passed the existing checker.
 - A headless editor session loaded embedded modules, changed a module, added one, saved `.docm`, and reopened both sources with the document text preserved. Exporting `.bas` preserved the source exactly.
-- 35 .NET tests pass against both FakeEngine and the real Linux headless Nisaba engine. Embedded Cleanup macros execute, save/reopen with text and formatting preserved, and execute again from saved source; separate CLI runs preserve the binary VBA project exactly.
+- 35 .NET tests pass against both FakeEngine and the real Linux headless DraftHearth engine. Embedded Cleanup macros execute, save/reopen with text and formatting preserved, and execute again from saved source; separate CLI runs preserve the binary VBA project exactly.
 - 35 .NET synthetic/FakeEngine tests, four editor tests (including the optional real helper check), and the undo/signature engine regression passed. Formatting, Clippy, asset attribution, dependency layering and the 18-crate WASM check passed.
 - Full workspace validation is still blocked by four font/layout tests outside this change. Native Word, native Windows/macOS runtime behavior, form-design editing and GUI macro execution were not validated.
 

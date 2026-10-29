@@ -85,5 +85,3 @@ arboard = { workspace = true, features = ["image-data"] }
 # The control server's random key.
 getrandom = "0.3"
 # Loads FLUX.2 klein when the desktop app opens, if the files are already on disk.
-wordcraft-sharedai.workspace = true
-sharedai-client = { path = "../../../Enki/crates/client" }

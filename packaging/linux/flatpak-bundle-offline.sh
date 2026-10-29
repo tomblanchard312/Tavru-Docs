@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Assemble the Nisaba Flatpak bundle without flatpak-builder (no Flathub access here):
+# Assemble the DraftHearth Flatpak bundle without flatpak-builder (no Flathub access here):
 # the same files and finish-args as packaging/linux/flatpak/io.github.tomblanchard312.Nisaba.bundle.yml.
 # usage: packaging/linux/flatpak-bundle-offline.sh <nisaba tarball from package.sh> <out.flatpak>
 # Needs flatpak and librsvg2-common (icon validation); the runtime is fetched from Flathub when the
@@ -13,7 +13,10 @@ mkdir -p "$WORK/stage" "$WORK/app/files"
 tar -xzf "$TARBALL" -C "$WORK/stage" --strip-components=1
 cd "$WORK/stage"
 F="$WORK/app/files"
-install -Dm755 bin/nisaba "$F/bin/nisaba"
+install -Dm755 bin/nisaba "$F/bin/nisaba-bin"
+install -Dm755 bin/nisaba-launch "$F/bin/nisaba"
+mkdir -p "$F/lib/enki-payload"
+cp -a lib/nisaba/enki-payload/. "$F/lib/enki-payload/"
 install -Dm755 bin/nisaba-cli "$F/bin/nisaba-cli"
 install -Dm644 share/applications/$APP_ID.desktop "$F/share/applications/$APP_ID.desktop"
 install -Dm644 share/mime/packages/$APP_ID.xml "$F/share/mime/packages/$APP_ID.xml"
