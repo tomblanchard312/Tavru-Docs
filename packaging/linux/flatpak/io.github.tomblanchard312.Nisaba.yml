@@ -33,6 +33,8 @@ finish-args:
   # line, Open Recent, "Save" next to the original) work in the usual places.
   - --filesystem=xdg-documents
   - --filesystem=xdg-pictures
+  # Models downloaded or added by the user, matching the native per-user model folder.
+  - --filesystem=xdg-data/nisaba
   # Home/host filesystem access remains restricted.
 
 modules:
