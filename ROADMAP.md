@@ -2,7 +2,7 @@
 
 > **Upstream integration:** 2026-10-26 · WordCraft `438775ce` (296 incoming commits) reconciled with Nisaba, including egui 0.37 and native document windows. Scribe/VBA retained; font/layout test assumptions corrected and all eight CI gates pass. See [integration evidence](docs/upstream-sync.md).
 
-> **Status update:** 2026-10-26 · Scribe uses in-process CPU GGUF inference and verified model downloads; Developer has a VBA project explorer, source editor, document designer, contextual local chat and separate Phi-4 completion. Readiness estimates unchanged.
+> **Status update:** 2026-10-28 · Scribe and Developer chat and completion go through the Enki daemon, with verified model downloads; Developer has a VBA project explorer, source editor, document designer, contextual local chat and separate Phi-4 completion. Readiness estimates unchanged.
 
 > **Highlight update:** 2026-10-25 · Highlight shortcut toggles the last chosen colour off when the whole selection has it; explicit colour commands remain setters (#4085). Readiness estimates unchanged.
 

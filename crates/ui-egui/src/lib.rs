@@ -16,6 +16,7 @@ macro_rules! tl {
 pub mod a11y;
 pub mod a11y_pane;
 pub mod assistant_pane;
+mod image_gen;
 pub mod async_saves;
 pub mod autoscroll;
 pub mod backstage;
@@ -94,6 +95,8 @@ pub use dialogs::dialogs_smart_art;
 pub use dialogs::dialogs_table_style;
 pub use dialogs::dialogs_templates;
 pub use file_dialogs::{FileDialogAnswer, FileDialogRequest, open_filters};
+#[cfg(not(target_arch = "wasm32"))]
+pub use image_gen::warm_default_image_model;
 
 mod app;
 mod clock;
@@ -472,6 +475,8 @@ pub struct WordApp {
     pub previews: previews::Previews,
     /// Scribe assistant conversation and local model state.
     pub assistant: assistant_pane::State,
+    /// Image generation and inpainting state.
+    pub image_gen: image_gen::State,
     /// VBA editor, modules, and assistant state.
     pub vba: vba_editor::State,
     /// Media key of the picture a pending Change Picture replaces (#147).
