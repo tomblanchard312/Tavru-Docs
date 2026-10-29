@@ -1,4 +1,4 @@
-# Flatpak manifest for Nisaba, ready for a Flathub submission.
+# Flatpak manifest for DraftHearth, ready for a Flathub submission.
 #
 # Flatpak builds run offline, so the crate sources must be vendored first. From the repo root:
 #
@@ -33,6 +33,15 @@ finish-args:
   # line, Open Recent, "Save" next to the original) work in the usual places.
   - --filesystem=xdg-documents
   - --filesystem=xdg-pictures
+  # Models downloaded or added by the user, matching the native per-user model folder.
+  - --filesystem=xdg-data/nisaba
+  # Shared Enki on the host. The launcher installs or updates it and uses its socket.
+  # A newer Enki already installed is left as it is.
+  - --filesystem=xdg-data/enki:create
+  - --filesystem=xdg-data/SharedAI:create
+  - --filesystem=xdg-run/sharedai:create
+  - --filesystem=/usr/lib/enki:ro
+  - --talk-name=org.freedesktop.Flatpak
   # Home/host filesystem access remains restricted.
 
 modules:
@@ -47,7 +56,10 @@ modules:
         CRAFT_I18N_REQUIRED: '1'
     build-commands:
       - cargo --offline build --release --locked -p wordcraft -p wordcraft-cli
-      - install -Dm755 target/release/wordcraft /app/bin/nisaba
+      - install -Dm755 target/release/wordcraft /app/bin/nisaba-bin
+      # The release bundle copies Enki into /app/lib/enki-payload. This from-source build does not
+      # compile Enki; the launcher runs DraftHearth, and installs Enki when that payload is present.
+      - install -Dm755 packaging/linux/enki-flatpak-launch.sh /app/bin/nisaba
       - install -Dm755 target/release/wordcraft-cli /app/bin/nisaba-cli
       - install -Dm644 packaging/linux/io.github.tomblanchard312.Nisaba.desktop /app/share/applications/io.github.tomblanchard312.Nisaba.desktop
       - install -Dm644 packaging/linux/io.github.tomblanchard312.Nisaba.mime.xml /app/share/mime/packages/io.github.tomblanchard312.Nisaba.xml

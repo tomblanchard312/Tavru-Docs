@@ -1,4 +1,4 @@
-//! Nisaba's writing assistant ([`wordcraft_brand::ASSISTANT_NAME`]): put a model's suggestion
+//! DraftHearth's writing assistant ([`wordcraft_brand::ASSISTANT_NAME`]): put a model's suggestion
 //! into the document as tracked changes.
 //!
 //! The model runs locally in the UI process (driven by the assistant pane; users only

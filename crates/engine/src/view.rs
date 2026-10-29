@@ -39,7 +39,7 @@ pub struct ViewState {
     /// The Accessibility pane (Review › Check Accessibility): the checker's findings.
     #[serde(default)]
     pub accessibility_pane: bool,
-    /// Nisaba's assistant pane.
+    /// DraftHearth's assistant pane.
     #[serde(default)]
     pub assistant_pane: bool,
     /// Side-by-side VBA source editor (Developer).

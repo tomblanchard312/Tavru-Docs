@@ -1,10 +1,10 @@
-# Nisaba VBA
+# DraftHearth VBA
 
-Run Word VBA macros against Nisaba (or upstream [WordCraft](https://github.com/storytold/wordcraft)). VBA is transpiled to VB.NET, compiled in memory with Roslyn, checked against an allow-list, and run against a Word object model implemented over the app's command protocol.
+Run Word VBA macros against DraftHearth (or upstream [WordCraft](https://github.com/storytold/wordcraft)). VBA is transpiled to VB.NET, compiled in memory with Roslyn, checked against an allow-list, and run against a Word object model implemented over the app's command protocol.
 
-This folder was the separate `wordcraft-vba` repository; its history is kept in Nisaba's. It is an optional .NET component: `cargo` doesn't build it and `cargo xtask ci` doesn't run it. The C# namespaces keep their `WordCraft.*` names, as Nisaba's Rust crates do. Licence: MIT OR Apache-2.0, like the rest of the repository.
+This folder was the separate `wordcraft-vba` repository; its history is kept in DraftHearth's. It is an optional .NET component: `cargo` doesn't build it and `cargo xtask ci` doesn't run it. The C# namespaces keep their `WordCraft.*` names, as DraftHearth's Rust crates do. Licence: MIT OR Apache-2.0, like the rest of the repository.
 
-**Status:** spike. Nisaba now has a [side-by-side VBA source editor](../docs/vba-editor.md) with syntax colors, embedded-module browsing, local Phi-4 completion and a live document-model pane. The current synthetic suite passes 37 tests on the real headless Nisaba engine; FakeEngine passes 35 with two real-only form tests explicitly skipped. It covers the transpiler, object model, macro execution and project preservation. Native Word runtime and repair-free round-trip validation remain open.
+**Status:** early, usable workbench and a limited macro runtime. The desktop editor supports `.bas`/`.cls` source editing, existing-module browsing and `.docm` source updates, with a document designer, icon-based controls toolbox, local coding chat and separately reviewed local code completion. The optional CLI helper transpiles, checks and runs a supported subset of VBA against DraftHearth's document engine. This is not full Word VBA compatibility. Native Microsoft Word execution and repair-free round-trip validation remain unverified. See the [workspace guide](../docs/vba-editor.md) for UI behavior and boundaries.
 
 ```
 VBA (.bas/.cls) ──► Transpiler ──► VB.NET ──► Roslyn (Option Strict Off) ──► MacroSecurity ──► run
@@ -18,14 +18,14 @@ VBA (.bas/.cls) ──► Transpiler ──► VB.NET ──► Roslyn (Option S
 
 ## Quick start
 
-Requires a .NET 8 or newer SDK. There are no package dependencies: the VB compiler comes from the SDK (`RoslynDir` overrides it), so the projects target the .NET that SDK ships (`net8.0` with SDK 8, `net10.0` with SDK 10) and run on it.
+Requires a .NET 8 or newer SDK. There are no package dependencies: the VB compiler comes from the SDK (`RoslynDir` overrides it), so the projects target the .NET version bundled with that SDK and run on it. The desktop editor can use an installed `wcvba` helper, `NISABA_VBA`, or the SDK from this checkout for source checks and `.docm` module operations. Macro execution is currently exposed by the CLI, not by a GUI Run button.
 
 ```sh
 cd vba
 dotnet build
-dotnet run --project tests/WordCraft.Vba.Tests   # on FakeEngine
+dotnet run --project tests/WordCraft.Vba.Tests   # synthetic tests, including FakeEngine
 cargo build --release -p wordcraft-cli --manifest-path ../Cargo.toml
-WCVBA_CLI=../target/release/wordcraft-cli dotnet run --project tests/WordCraft.Vba.Tests   # same tests on Nisaba
+WCVBA_CLI=../target/release/wordcraft-cli dotnet run --project tests/WordCraft.Vba.Tests   # engine-backed tests on DraftHearth
 
 dotnet run --project src/WordCraft.Vba -- transpile samples/Cleanup.bas
 dotnet run --project src/WordCraft.Vba -- check samples/Evil.bas            # rejected
@@ -33,16 +33,21 @@ dotnet run --project src/WordCraft.Vba -- run samples/Cleanup.bas --macro Main -
 
 # macro-enabled documents: modules are read straight from the file
 dotnet run --project src/WordCraft.Vba -- list report.docm
-dotnet run --project src/WordCraft.Vba -- run report.docm --macro Main --cli nisaba-cli --save out.docm
+dotnet run --project src/WordCraft.Vba -- run report.docm --macro Main --cli ../target/release/wordcraft-cli --save out.docm
 dotnet run --project src/WordCraft.Vba -- pack samples/Cleanup.bas --into plain.docx --out report.docm   # test documents
 
-# a running Nisaba window
+# a running DraftHearth window
 nisaba --control 7981 &
 dotnet run --project src/WordCraft.Vba -- run samples/Cleanup.bas --macro Main --connect 7981
-dotnet run --project src/WordCraft.Vba -- run samples/Cleanup.bas --macro Main --cli nisaba-cli --doc in.docx --save out.docx
+dotnet run --project src/WordCraft.Vba -- run samples/Cleanup.bas --macro Main --cli ../target/release/wordcraft-cli --doc in.docx --save out.docx
 ```
 
-`--connect` reads the window's key from `WORDCRAFT_CONTROL_KEY`, else from `control-key.local-<port>` in Nisaba's settings folder (`~/.config/nisaba`, or `Nisaba` under Application Support / `%APPDATA%`), then WordCraft's. `WORDCRAFT_PROFILE_DIR` overrides both, as it does for the app. `Application.Name` is "Nisaba".
+The helper's executable is named `wcvba` when installed. A command-line engine path passed to
+`--cli` must support DraftHearth's MCP stdio protocol (the workspace build names it `wordcraft-cli`).
+For a headless run, use `--cli`; `--connect` attaches to a running desktop control channel. The
+optional `--unsafe` switch bypasses the macro allow-list and should only be used for trusted code.
+
+`--connect` reads the window's key from `WORDCRAFT_CONTROL_KEY`, else from `control-key.local-<port>` in DraftHearth's settings folder (`~/.config/nisaba`, or `DraftHearth` under Application Support / `%APPDATA%`), then WordCraft's. `WORDCRAFT_PROFILE_DIR` overrides both, as it does for the app. `Application.Name` is "DraftHearth".
 
 ## How the object model maps to WordCraft
 
@@ -74,7 +79,13 @@ Covers: `Integer`/`Long`/`Currency`/`Variant` widths, ByRef by default, Optional
 - `VbaProjectReader`: the `dir` stream, module kinds from `PROJECT`, the project's code page. Sources: .docm/.dotm (`word/vbaProject.bin`, located through the package relationships), .doc/.dot (the `Macros` storage), or a bare vbaProject.bin.
 - `VbaPackage`: writes a vbaProject.bin (source only; `_VBA_PROJECT` version 0xFFFF tells the host to compile) and turns a .docx into a .docm. It writes no protection records (CMG/DPB/GC), so it's used for test documents and hasn't been checked against Word yet.
 
-WordCraft keeps the VBA project when it saves a .docm; a test checks that.
+DraftHearth preserves the VBA project when saving a `.docm`. The editor can update supported existing
+module sources and save them with the document, preserving unedited modules and opaque project
+records. Unsupported project layouts and lossy code-page conversions are refused. No-op updates
+preserve project bytes. Editing signed projects requires explicit confirmation to remove the now
+invalid signature. Adding new project modules or changing module kinds is not supported by the
+editor. Synthetic tests cover these preservation rules; native Word compatibility has not been
+validated.
 
 ## Security
 
@@ -96,31 +107,34 @@ access; ambiguous/deleted controls and document switches are refused. These APIs
 Control creation, events, drop-down/date members, headers and UserForms remain open. See the
 [workspace guide](../docs/vba-editor.md#vba-access-to-form-controls) for an example and validation.
 
-## Known gaps
+## Desktop workspace and current limits
 
-- Only the headless transport (`--cli`) has been tested; the control channel to a running window (`--connect`) has not.
-- Developer › Code Editor supports source editing and checking; macro execution still uses this command line tool.
-- Shipping it by default means shipping .NET (on FreeBSD, the `lang/dotnet` port).
-- `Property Get/Let/Set`, UserForms (skipped with a warning), events (`Document_Open`, `AutoOpen` don't run on open). The editor writes changed source back to supported `.docm` projects; unsupported directory layouts and lossy code-page conversions are refused. Native Word round trips are not yet validated.
-- Headers, footers, notes, fields as Word counts them (WordCraft shows a field's result), tables (`Tables`, `Cells`), `Font.Size`/`Name` from styles (only explicit run formatting is read), `Find` with formatting.
-- `(1 To n)` arrays become 0-based arrays one element longer: `LBound` is 0 and `For Each` sees an extra empty first element.
-- `Debug.Print` doesn't pad numbers the way VBA does.
+- Open **Developer › Code Editor** (Alt+F11) for the side-by-side **Code**, **Designer** and **Chat** workspace. The project explorer lists embedded modules and open/imported source modules; syntax colors distinguish VBA tokens. Save a module as `.bas`/`.cls` or save supported edited project sources with the document as `.docm`.
+- The **Designer** shows and edits the live document surface. Its icon-only toolbox inserts supported body content controls by drag-and-drop or at the caret. It is not a visual VBA UserForm designer. The document-model pane displays/selects body paragraphs, including nested table-cell paragraphs.
+- **Chat** uses the model selected in Scribe and sends bounded document and module context. **Suggest code** uses the local completion model configured through Scribe. Both show proposals for review; generated VBA is not automatically inserted or executed. Completion insertion is guarded against source changes while inference runs.
+- The UI can **Check** and **Transpile** through the optional helper. Macro execution remains a separate CLI action; the GUI has no Run button. The headless CLI path is tested; the desktop `--connect` execution path has not been validated in the current test record.
+- Shipping the runtime by default also requires shipping .NET (on FreeBSD, the `lang/dotnet` port).
+- `Property Get/Let/Set`, UserForms (skipped with a warning), events (`Document_Open`, `AutoOpen` do not run on open), debugging, full IntelliSense and project-reference editing are not implemented. Headers, footers, notes, full field semantics and table/cell object-model collections are also incomplete. `Font.Size`/`Name` getters read explicit run formatting, not style-derived values; `Find` with formatting is unsupported.
+- `(1 To n)` arrays become 0-based arrays one element longer: `LBound` is 0 and `For Each` sees an extra empty first element. `Debug.Print` does not pad numbers the way VBA does.
+- The allow-list is defense in depth, not an OS sandbox. Macro execution should be limited to trusted code until the runner is isolated. Native Word, Windows/macOS runtime, signature behavior in Word, and repair-free round trips are not validated.
 
-## Validation on 2026-10-25
+## Validation record
 
-The .NET solution builds with zero warnings/errors. All 35 tests pass against the real Linux
-headless Nisaba engine (`WCVBA_CLI=target/debug/wordcraft-cli`), and the FakeEngine suite also
-passes. The DOCM execution regression runs the full Cleanup macro, saves/reopens the document,
-checks text, bold and heading style, recompiles the preserved source and runs it again.
+The last recorded VBA runtime validation (2026-10-26) reports 37 tests passing against the real
+Linux headless DraftHearth engine. The FakeEngine suite reports 35 passing with two engine-only form
+tests skipped. Coverage includes transpilation, object-model behavior, macro execution and project
+preservation. A synthetic embedded macro updated a body text control and checkbox. The broader
+workspace guide records local chat/completion insertion and compilation checks, plus designer drag
+and drop exercised through the headless UI/control harness; these are not live desktop GUI tests.
 
-A separate command-line run of embedded `Cleanup.Main` saved
-`/tmp/nisaba-macro-executed.docm`; rerunning `Cleanup.FixDoubleSpaces` from that saved document
-produced `/tmp/nisaba-macro-reexecuted.docm`. Direct package inspection confirmed the expected
-text, heading style, bold formatting, macro-enabled content type and byte-identical VBA project
-in both outputs. These are original synthetic fixtures. Native Word execution, desktop control
-transport and OS sandbox confinement were not tested; GUI macro execution remains unavailable.
+The macro regression runs an embedded synthetic macro, saves and reopens the document, checks text
+and formatting, then recompiles preserved source and executes it again. These checks use original
+synthetic fixtures. They do not establish native Word execution or repair-free compatibility in
+Microsoft Word. The runtime is not OS-sandboxed.
 
 ## Revision history
+
+- 2026-10-28: Updated this guide to match the current editor, designer, local assistant, helper and CLI runtime boundaries; clarified validation scope and unsupported features.
 
 - 2026-10-26: Main-body form control facade, ID/document guards, text and check-box edits, metadata/lock properties; 37 real-engine tests pass. Chained collection property assignments now transpile correctly.
 

@@ -118,13 +118,6 @@ fn thai_font_installed() -> bool {
     wordcraft_fonts::FontDb::global().fallback_for('\u{0E19}', 0).is_some()
 }
 
-/// Is a Thai font with Latin letters and digits installed (Tahoma, Leelawadee UI, Thonburi, the
-/// TLWG fonts…)? Noto Sans Thai alone has none, so no face covers [`THAI_RUN`]: `false` skips.
-fn thai_latin_font_installed() -> bool {
-    let face = wordcraft_fonts::word::resolve("TH Sarabun New", false, false).face;
-    THAI_RUN.chars().filter(|c| !c.is_whitespace()).all(|c| face.covers(c))
-}
-
 /// Body paragraph 0 of `text`, its run set in `font` at 16 pt (`None` keeps the document's
 /// default font), and the face of every cluster: (cluster start, face).
 fn cluster_faces(text: &str, font: Option<&str>) -> Vec<(usize, wordcraft_fonts::FaceRef)> {

@@ -1,5 +1,5 @@
-//! A small, blocking client for the [SharedAI](https://github.com/tomblanchard312/SharedAI)
-//! daemon: list its models and stream a chat reply.
+//! A small, blocking client for the Enki daemon (`sharedai-daemon`): list its models and stream a
+//! chat reply. DraftHearth does not link llama.cpp; the daemon's worker does.
 //!
 //! SharedAI runs models on the user's own machine. Its wire contract (docs/INFERENCE.md there) is
 //! newline-delimited JSON over a private Unix socket: negotiate a protocol version, send one
@@ -11,7 +11,7 @@
 //! [`Error::Unsupported`].
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
-/// In-process GGUF inference used by the desktop assistant.
+/// GGUF file checks. Chat runs through [`chat_file`].
 pub mod local;
 /// Pinned assistant models and verified downloads.
 pub mod models;
@@ -135,7 +135,7 @@ impl From<std::io::Error> for Error {
 }
 
 /// The socket to use: `configured` if non-empty, else `$SHAREDAI_SOCKET`, else
-/// `$XDG_RUNTIME_DIR/sharedai/ipc.sock` (the Nisaba desktop's convention).
+/// `$XDG_RUNTIME_DIR/sharedai/ipc.sock` (the DraftHearth desktop's convention).
 pub fn endpoint(configured: &str) -> Result<PathBuf, Error> {
     let configured = configured.trim();
     if !configured.is_empty() {
@@ -303,6 +303,48 @@ pub fn model_id(path: &std::path::Path) -> String {
     if id.is_empty() { "model".into() } else { id }
 }
 
+/// Chat with the GGUF file at `path` through the Enki daemon.
+///
+/// Starts `sharedai-daemon` when nothing is listening, registers the file, and streams the reply.
+/// A catalog model is refused when its bytes do not match the pinned checksum. The file path is
+/// what Scribe stores; the daemon is asked for that file's registry id.
+pub fn chat_file(path: &str, messages: &[Message], params: &Params, cancel: &AtomicBool, on_chunk: impl FnMut(&str)) -> Result<Summary, Error> {
+    if messages.len() > MAX_MESSAGES
+        || messages.iter().try_fold(0usize, |sum, m| sum.checked_add(m.content.len())?.checked_add(m.role.len())).is_none_or(|n| n > 128 * 1024)
+    {
+        return Err(Error::Invalid("Message too large".into()));
+    }
+    if cancel.load(Ordering::Relaxed) {
+        return Err(Error::Cancelled);
+    }
+    let file = std::path::Path::new(path);
+    local::validate_model(file)?;
+    let file = file.canonicalize()?;
+    let (size, sha256) = hash_file(&file)?;
+    let license = if let Some(spec) = models::CATALOG.iter().find(|m| file.file_name().is_some_and(|name| name == m.file)) {
+        if size != spec.size || sha256 != spec.sha256 {
+            return Err(Error::Invalid("The model checksum does not match. Download it again.".into()));
+        }
+        spec.license
+    } else {
+        "unknown"
+    };
+    #[cfg(not(unix))]
+    {
+        let _ = (params, on_chunk, size, sha256, license);
+        return Err(Error::Unsupported);
+    }
+    #[cfg(unix)]
+    {
+        let endpoint = endpoint("")?;
+        ensure_running(&endpoint, Some(&endpoint))?;
+        let size = i64::try_from(size).map_err(|_| Error::Invalid("the model file is too large".into()))?;
+        let id = model_id(&file);
+        net::register_known(&endpoint, "nisaba", &id, &file, size, &sha256, license)?;
+        chat(&endpoint, "nisaba", &id, messages, params, Timeouts::default(), cancel, on_chunk)
+    }
+}
+
 /// Size and lowercase hex SHA-256 of a file, read in 1 MiB pieces.
 pub fn hash_file(path: &std::path::Path) -> Result<(u64, String), Error> {
     use sha2::{Digest, Sha256};
@@ -323,16 +365,79 @@ pub fn hash_file(path: &std::path::Path) -> Result<(u64, String), Error> {
     Ok((size, hex))
 }
 
-/// Where to find `sharedai-daemon`: `SHAREDAI_DAEMON`; then the program's private helper folder,
-/// `<prefix>/lib/<program>/` (how Nisaba's packages ship it: `/usr/bin/nisaba` looks in
-/// `/usr/lib/nisaba/`); then next to the program (a cargo build); then each `PATH` directory.
+/// Where to find `sharedai-daemon`: `SHAREDAI_DAEMON`, then `SHAREDAI_BIN_DIR`, then the newest
+/// shared install (`/usr/lib/enki` or `$XDG_DATA_HOME/enki`), then the program's private helper
+/// folder, `<prefix>/lib/<program>/`, then next to the program, then each `PATH` directory.
 pub fn find_daemon() -> Option<std::path::PathBuf> {
     if let Some(p) = std::env::var_os("SHAREDAI_DAEMON").filter(|p| !p.is_empty()) {
         return Some(p.into()).filter(|p: &std::path::PathBuf| p.is_file());
     }
+    if let Some(dir) = std::env::var_os("SHAREDAI_BIN_DIR").filter(|p| !p.is_empty()) {
+        let bundled = std::path::PathBuf::from(dir).join("sharedai-daemon");
+        if bundled.is_file() {
+            return Some(bundled);
+        }
+    }
     let exe = std::env::current_exe().ok();
-    let candidates = daemon_candidates(exe.as_deref(), std::env::var_os("PATH").as_deref());
+    let mut candidates = Vec::new();
+    if let Some(shared) = newest_daemon(&installed_daemon_paths()) {
+        candidates.push(shared);
+    }
+    candidates.extend(daemon_candidates(exe.as_deref(), std::env::var_os("PATH").as_deref()));
     candidates.into_iter().find(|p| p.is_file())
+}
+
+/// `/usr/lib/enki` first, then the per-user install. [`newest_daemon`] keeps the first on a tie.
+fn installed_daemon_paths() -> Vec<std::path::PathBuf> {
+    let mut paths = vec![std::path::PathBuf::from("/usr/lib/enki/sharedai-daemon")];
+    if let Some(data) = data_home() {
+        paths.push(data.join("enki").join("sharedai-daemon"));
+    }
+    paths
+}
+
+fn data_home() -> Option<std::path::PathBuf> {
+    if let Some(dir) = std::env::var_os("XDG_DATA_HOME").filter(|dir| !dir.is_empty()) {
+        return Some(std::path::PathBuf::from(dir));
+    }
+    std::env::var_os("HOME").filter(|home| !home.is_empty()).map(|home| std::path::PathBuf::from(home).join(".local/share"))
+}
+
+/// The newest `sharedai-daemon` in `paths`, compared by the `VERSION` file in its directory.
+/// A missing or unreadable `VERSION` sorts as `0.0.0`. The earlier path wins when versions match.
+fn newest_daemon(paths: &[std::path::PathBuf]) -> Option<std::path::PathBuf> {
+    let mut best: Option<(std::path::PathBuf, (u64, u64, u64, u64))> = None;
+    for path in paths {
+        if !path.is_file() {
+            continue;
+        }
+        let dir = path.parent().unwrap_or(path.as_path());
+        let key = version_key(dir);
+        let replace = match &best {
+            None => true,
+            Some((_, old)) => key > *old,
+        };
+        if replace {
+            best = Some((path.clone(), key));
+        }
+    }
+    best.map(|(path, _)| path)
+}
+
+/// `VERSION` is `major.minor.patch stamp`. Non-numeric text sorts as zero.
+fn version_key(dir: &std::path::Path) -> (u64, u64, u64, u64) {
+    let Ok(text) = std::fs::read_to_string(dir.join("VERSION")) else {
+        return (0, 0, 0, 0);
+    };
+    let mut words = text.split_whitespace();
+    let version = words.next().unwrap_or("0");
+    let stamp = words.next().and_then(|word| word.parse().ok()).unwrap_or(0);
+    let mut nums = [0u64; 3];
+    for (index, part) in version.split('.').take(3).enumerate() {
+        let digits: String = part.chars().take_while(|c| c.is_ascii_digit()).collect();
+        nums[index] = digits.parse().unwrap_or(0);
+    }
+    (nums[0], nums[1], nums[2], stamp)
 }
 
 /// The places [`find_daemon`] looks, in order, for a program at `exe` and a `PATH` value.
@@ -355,7 +460,10 @@ pub fn daemon_candidates(exe: Option<&std::path::Path>, path: Option<&std::ffi::
 
 #[cfg(unix)]
 mod net {
-    use super::*;
+    use super::{
+        AtomicBool, Duration, Error, FrameReader, MAX_FRAME_V1, MAX_FRAME_V2, Message, POLL, Params, Summary, Timeouts, VERSION_BASE,
+        VERSION_INFERENCE, Value, chat_request, drive, encode, find_daemon, hash_file, json,
+    };
     use std::io::Write;
     use std::os::unix::net::UnixStream;
     use std::path::Path;
@@ -420,13 +528,17 @@ mod net {
     pub fn register_file(endpoint: &Path, app: &str, id: &str, path: &Path) -> Result<(), Error> {
         let (size, sha256) = hash_file(path)?;
         let size = i64::try_from(size).map_err(|_| Error::Invalid("the model file is too large".into()))?;
+        register_known(endpoint, app, id, path, size, &sha256, "unknown")
+    }
+
+    pub(crate) fn register_known(endpoint: &Path, app: &str, id: &str, path: &Path, size: i64, sha256: &str, license: &str) -> Result<(), Error> {
         let model = json!({
             "id": id,
             "path": path.to_string_lossy(),
             "sha256": sha256,
             "size_bytes": size,
             "source": "local-file",
-            "license": "unknown",
+            "license": license,
         });
         let mut reader = connect(endpoint, app, VERSION_BASE)?;
         reader.inner.write_all(&encode(&json!({"type": "register_models", "models": [model]}), MAX_FRAME_V1)?)?;
@@ -452,6 +564,7 @@ mod net {
         }
     }
 
+    #[allow(clippy::too_many_arguments)] // Matches the public streaming API.
     pub fn chat(
         endpoint: &Path,
         app: &str,
