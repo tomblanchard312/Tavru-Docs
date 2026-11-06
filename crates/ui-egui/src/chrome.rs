@@ -619,7 +619,7 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                     let reading = app.session.view.read_mode;
                     let z = (if reading { app.session.view.read_zoom } else { app.canvas.scale / crate::canvas::PX_PER_PT } * 100.0).round();
                     let ztxt = format!("{z}%");
-                    let zfont = TypeRung::Caption.regular();
+                    let zfont = egui::FontId::new(TypeRung::Caption.size(), eridu_style::fonts::numeric());
                     let ztrack = TypeRung::Caption.tracking();
                     let zw = text_width(ui.painter(), &ztxt, &zfont, ztrack, t.text_dim);
                     // A fixed width for three digits plus a small reserve, so the controls to the

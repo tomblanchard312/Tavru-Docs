@@ -783,14 +783,15 @@ fn shape_and_chart_formats_leave_out_of_range_sizes_alone() {
 }
 
 #[test]
-fn review_tab_contains_one_scribe_button() {
+fn review_tab_contains_one_enki_button() {
     let mut app = WordApp::new(Session::new(wordcraft_doc::Document::new()), crate::Services::default());
     let ctx = egui::Context::default();
-    let texture = crate::icons::scribe_texture(&ctx).unwrap();
+    crate::theme::install_fonts(&ctx);
+    let texture = crate::icons::enki_texture(&ctx).unwrap();
     let output = ctx.run_ui(egui::RawInput::default(), |ui| {
         ui.horizontal(|ui| super::review::review(&mut app, ui));
     });
     let count = output.shapes.iter().filter(|s| matches!(&s.shape,egui::Shape::Mesh(m) if m.texture_id==texture.id())).count();
     output.drop_without_applying_deltas();
-    assert_eq!(count, 1, "Review must paint exactly one Scribe button");
+    assert_eq!(count, 1, "Review must paint exactly one Enki button");
 }
