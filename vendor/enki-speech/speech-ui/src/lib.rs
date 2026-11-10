@@ -1,4 +1,4 @@
-//! Optional consumer-side controls. The Enki daemon stays headless and never opens microphones.
+//! Optional consumer-side controls. The Oqelith daemon stays headless and never opens microphones.
 #![forbid(unsafe_code)]
 mod capture;
 mod voice;
@@ -259,12 +259,12 @@ fn transcribe(app: &str, input: Input, language: Option<String>, cancel: &Cancel
     {
         return Err("Enter a language name such as English or Spanish.".into());
     }
-    let endpoint = sharedai_client::service_endpoint().ok_or("Start or update Enki to enable local speech.")?;
+    let endpoint = sharedai_client::service_endpoint().ok_or("Start or update Oqelith to enable local speech.")?;
     let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build().map_err(|e| e.to_string())?;
     runtime.block_on(async{
         let client=Client::new(endpoint,app);
         let capability=client.speech_capabilities(cancel).await.map_err(|e|format!("Local speech is unavailable: {e}"))?;
-        if !capability.available{return Err("Install whisper.cpp and configure Enki’s ENKI_WHISPER_CLI path before using speech.".into());}
+        if !capability.available{return Err("Install whisper.cpp and configure Oqelith’s ENKI_WHISPER_CLI path before using speech.".into());}
         let Response::Models{ids}=client.request(Request::ListModels,cancel).await.map_err(|e|e.to_string())? else{return Err("Local model discovery failed.".into());};
         let mut whisper=Vec::new();let mut text_models=Vec::new();
         for id in ids {
@@ -277,7 +277,7 @@ fn transcribe(app: &str, input: Input, language: Option<String>, cancel: &Cancel
             if !lower.contains("image")&&!lower.contains("embed")&&(lower.contains("phi-4")||lower.contains("phi4")||lower.contains("qwen")){text_models.push(id);}
         }
         whisper.sort_by_key(|id|{let n=id.to_lowercase();if n.contains("small"){0}else if n.contains("base"){1}else if n.contains("tiny"){2}else{3}});
-        let model=whisper.first().ok_or("Add a Whisper ggml-*.bin model to Enki’s models folder.")?;
+        let model=whisper.first().ok_or("Add a Whisper ggml-*.bin model to Oqelith’s models folder.")?;
         let english=language.as_ref().is_some_and(|s|s.eq_ignore_ascii_case("english")||s.eq_ignore_ascii_case("en"));
         let mut translated=false;
         let text=match input{

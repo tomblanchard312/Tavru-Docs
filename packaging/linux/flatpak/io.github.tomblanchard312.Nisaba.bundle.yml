@@ -43,8 +43,8 @@ finish-args:
   - --filesystem=xdg-pictures
   # Models downloaded or added by the user, matching the native per-user model folder.
   - --filesystem=xdg-data/nisaba
-  # Shared Enki on the host. The launcher installs or updates it and uses its socket.
-  # A newer Enki already installed is left as it is.
+  # Shared Oqelith on the host. The launcher installs or updates it and uses its socket.
+  # A newer Oqelith already installed is left as it is.
   - --filesystem=xdg-data/enki:create
   - --filesystem=xdg-data/SharedAI:create
   - --filesystem=xdg-run/sharedai:create

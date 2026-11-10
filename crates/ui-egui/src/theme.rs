@@ -7,8 +7,8 @@ use egui::{Align2, Color32, CornerRadius, FontData, FontDefinitions, FontFamily,
 use eridu_style::{size, space};
 
 /// TavruOS purple workspace geometry; document pages retain their exact corners.
-pub const CONTROL_RADIUS: u8 = 10;
-pub const CHROME_RADIUS: u8 = 16;
+pub const CONTROL_RADIUS: u8 = eridu_style::radius::CONTROL;
+pub const CHROME_RADIUS: u8 = eridu_style::radius::SURFACE;
 
 /// The interface theme setting (File › Options › General, View › Interface Theme): a fixed light or
 /// dark palette, or `System`, which follows the OS light/dark appearance live (#115). Dark page

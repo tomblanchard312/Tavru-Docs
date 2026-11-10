@@ -4,32 +4,32 @@
 
 > **Portal reliability update (2026-11-08)** · Optional Ninimma picking requires an explicit protocol advertisement; immediate native cancellation is final. See [phase 0 portal scope and remaining gates](docs/PHASE0-PORTALS.md). Native release acceptance and readiness estimates remain unchanged.
 
-> **Eridu UI update (2026-11-05)** · Qanloom adopts shared Eridu light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the Eridu supplement. The writing assistant is now Enki, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
+> **Eridu UI update (2026-11-05)** · Qanloom adopts shared Eridu light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the Eridu supplement. The writing assistant is now Oqelith, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
 
 > **Scribe navigation: 2026-10-30** · The branded Scribe button is always available in the top bar, independent of the selected ribbon tab. The Review shortcut is removed; existing assistant behavior is unchanged.
 
 > **Qanloom rename: 2026-10-30** · DraftHearth is now Qanloom. Product UI, exports, package display names, wordmark, installer artwork and project links use Qanloom. Stable application/settings/upgrade identities and upstream attribution are retained. See [product identity](docs/product-name.md).
 
 
-> **Integration update: 2026-10-30** · Integrated 54 upstream commits through `5b5810fe`, preserving Qanloom branding, Enki, Scribe, VBA and runtime packaging. ZIP and Tokio advisories are patched; see [integration evidence](docs/upstream-sync.md). Platform readiness estimates are unchanged.
+> **Integration update: 2026-10-30** · Integrated 54 upstream commits through `5b5810fe`, preserving Qanloom branding, Oqelith, Scribe, VBA and runtime packaging. ZIP and Tokio advisories are patched; see [integration evidence](docs/upstream-sync.md). Platform readiness estimates are unchanged.
 
 
 > **Runtime integration: 2026-10-30** · Complete VBA runtime staging and scripting dependency guards now cover native package builders and local installs; see [runtime packaging](docs/scripting-runtimes.md). Platform readiness estimates are unchanged.
 
 > **Scribe update: 2026-10-29** · Scribe rewrites preserve paragraph properties and unchanged character formatting when the paragraph structure is retained. New tracked paragraph breaks no longer inherit a deletion marker; Accept All keeps them. Replies that flatten multiple paragraphs are refused with an Insert/retry option. Regression checks cover Accept/Reject, Unicode and DOCX round-trip. Native Linux validation; other native platforms remain unverified. Readiness estimates unchanged.
 
-> **Integration update: 2026-10-29** · Combined local product branding, Enki and file-picker changes with the synchronized upstream code. Existing settings and installation identities are retained. Readiness estimates are unchanged.
+> **Integration update: 2026-10-29** · Combined local product branding, Oqelith and file-picker changes with the synchronized upstream code. Existing settings and installation identities are retained. Readiness estimates are unchanged.
 
 > **Naming update: 2026-10-29** · Nisaba is now Qanloom. Existing user data, installation identities and automation interfaces are retained; readiness estimates are unchanged.
 
 > **File picker update: 2026-10-28** · Desktop Open, Save and assistant model selection prefer Ninimma 0.1.4 or later when installed, with native/built-in fallback. The web model-file control remains desktop-only. Platform acceptance is unchanged.
 
-> **Image generation update: 2026-10-28** · Enki supplies verified CPU/GPU recommendations (Z-Image-Turbo/Qwen), with a persistent busy panel, sampling progress, elapsed time and cancellation. Existing model versions remain selectable. Native Linux and headless UI checks are recorded in the local verification report; cross-platform acceptance is unchanged.
+> **Image generation update: 2026-10-28** · Oqelith supplies verified CPU/GPU recommendations (Z-Image-Turbo/Qwen), with a persistent busy panel, sampling progress, elapsed time and cancellation. Existing model versions remain selectable. Native Linux and headless UI checks are recorded in the local verification report; cross-platform acceptance is unchanged.
 
 
 > **Upstream integration:** 2026-10-28 · Merged WordCraft `c4fafc21` (179 commits since the previous shared point) as `0a873432`. Modular UI, engine, document, format, layout, font and PDF changes are integrated; Qanloom branding, Scribe, VBA and packaging work were carried forward. Workspace check and focused regressions passed; the full UI suite was interrupted and native MSI packaging was unavailable. See [integration evidence](docs/upstream-sync.md).
 
-> **Status update:** 2026-10-28 · Scribe and Developer chat and completion go through the Enki daemon, with verified model downloads; Developer has a VBA project explorer, source editor, document designer, contextual local chat and separate Phi-4 completion. Readiness estimates unchanged.
+> **Status update:** 2026-10-28 · Scribe and Developer chat and completion go through the Oqelith daemon, with verified model downloads; Developer has a VBA project explorer, source editor, document designer, contextual local chat and separate Phi-4 completion. Readiness estimates unchanged.
 
 > **Highlight update:** 2026-10-25 · Highlight shortcut toggles the last chosen colour off when the whole selection has it; explicit colour commands remain setters (#4085). Readiness estimates unchanged.
 

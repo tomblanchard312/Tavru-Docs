@@ -1,4 +1,4 @@
-//! Checks a model file before Qanloom hands it to the Enki daemon.
+//! Checks a model file before Qanloom hands it to the Oqelith daemon.
 use crate::Error;
 use std::path::Path;
 

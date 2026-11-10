@@ -1,5 +1,5 @@
 #!/bin/sh
-# Flatpak command. Installs or updates the host Enki, then runs Qanloom.
+# Flatpak command. Installs or updates the host Oqelith, then runs Qanloom.
 set -eu
 if [ -x /app/lib/enki-payload/enki-launch ]; then
   exec /app/lib/enki-payload/enki-launch /app/bin/nisaba-bin "$@"

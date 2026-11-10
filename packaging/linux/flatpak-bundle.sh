@@ -51,7 +51,7 @@ mkdir -p "$WORK/stage"
 tar -xzf "$TARBALL" -C "$WORK/stage" --strip-components=1
 [[ -x "$WORK/stage/bin/nisaba" ]] || { echo "error: $TARBALL has no bin/nisaba" >&2; exit 1; }
 [[ -x "$WORK/stage/bin/nisaba-launch" ]] || { echo "error: $TARBALL has no bin/nisaba-launch" >&2; exit 1; }
-[[ -x "$WORK/stage/lib/nisaba/enki-payload/sharedai-daemon" ]] || { echo "error: $TARBALL has no Enki payload" >&2; exit 1; }
+[[ -x "$WORK/stage/lib/nisaba/enki-payload/sharedai-daemon" ]] || { echo "error: $TARBALL has no Oqelith payload" >&2; exit 1; }
 cp "$HERE/flatpak/$APP_ID.bundle.yml" "$WORK/$APP_ID.yml"
 
 flatpak remote-add --user --if-not-exists flathub "$FLATHUB"

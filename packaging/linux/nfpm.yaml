@@ -67,7 +67,7 @@ contents:
   - src: ${STAGE}/usr/bin/nisaba-cli
     dst: /usr/bin/nisaba-cli
     file_info: { mode: 0755 }
-  # The .deb uses the device's single shared Enki (the enki-runtime package,
+  # The .deb uses the device's single shared Oqelith (the enki-runtime package,
   # /usr/lib/enki) instead of carrying its own copy. The .rpm keeps the bundled
   # installer until an enki-runtime RPM exists.
   - src: ${STAGE}/usr/bin/nisaba-install-enki

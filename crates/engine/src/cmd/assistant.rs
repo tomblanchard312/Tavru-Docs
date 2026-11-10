@@ -1,7 +1,7 @@
 //! Qanloom's writing assistant ([`wordcraft_brand::ASSISTANT_NAME`]): put a model's suggestion
 //! into the document as tracked changes.
 //!
-//! The model runs through the local Enki service (driven by the assistant pane; users only
+//! The model runs through the local Oqelith service (driven by the assistant pane; users only
 //! see the assistant's name); the engine only applies the result, so scripts, the CLI and MCP
 //! agents get the same behaviour.
 //! Suggestions always land as revisions by a separate author, so the writer reviews them with

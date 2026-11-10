@@ -1,6 +1,6 @@
 # Upstream integration
 
-> **Last updated:** 2026-10-30 · **Status:** Integration through `5b5810fe`, with fork branding/Enki/VBA retained and patched ZIP/Tokio dependencies. Current validation is recorded in the 2026-10-30 section below; older sections describe earlier refreshes.
+> **Last updated:** 2026-10-30 · **Status:** Integration through `5b5810fe`, with fork branding/Oqelith/VBA retained and patched ZIP/Tokio dependencies. Current validation is recorded in the 2026-10-30 section below; older sections describe earlier refreshes.
 
 
 ## 2026-10-30 integration
@@ -13,10 +13,10 @@ were reconciled, keeping both projects' contributor entries and progress records
   Do not re-enable the upstream Windows self-updater or its WordCraft identity. The unused
   `craft-update` workspace dependency and its new upstream-only icon constant are omitted.
 - Adopt upstream's optional saved-author preference, including a deliberately blank name.
-- Snapshot the existing Enki image client/protocol under `vendor/`, retaining its original
-  `UNLICENSED` designation. GitHub/clean-clone builds no longer require a sibling Enki
+- Snapshot the existing Oqelith image client/protocol under `vendor/`, retaining its original
+  `UNLICENSED` designation. GitHub/clean-clone builds no longer require a sibling Oqelith
   source checkout; the daemon repository and installed application are untouched.
-- Retain the Enki client, Scribe formatting safeguards, compiler-checked VBA module replacement,
+- Retain the Oqelith client, Scribe formatting safeguards, compiler-checked VBA module replacement,
   undo, unsaved-source close prompt, Ninimma picker and complete runtime staging.
 - Include upstream's DOCX preservation, table copy/cut, font-size, Arabic Backspace,
   chart fallback fonts, parser bounds, connector performance and Flatpak printing fixes.
@@ -50,16 +50,16 @@ following picture remains readable. Production size limits are unchanged.
 - Debug desktop and CLI binaries build successfully with the patched dependencies.
 - VBA compatibility runner against the rebuilt real headless CLI: 37 passed,
   zero failed, zero skipped, including content-control edits and DOCM preservation.
-- Isolated native Linux window with the existing Enki daemon: a generated module
+- Isolated native Linux window with the existing Oqelith daemon: a generated module
   passes the bundled compiler, Replace module removes the previous source, Undo
   restores it, and closing dirty VBA shows Save / Don't Save / Cancel. Cancel keeps
   the source; Save opens the picker without exiting. The screenshot was inspected.
-- A clean staged source export, with no sibling Enki checkout, resolves both Enki
+- A clean staged source export, with no sibling Oqelith checkout, resolves both Oqelith
   packages inside the repository. This is a dependency-resolution check, not a
   second complete clean-room compilation.
 - Fresh RustSec database: zero known vulnerabilities, four unmaintained-package
   warnings; no advisory suppression was added.
-- Existing fork/upstream contributor entries are preserved exactly. Enki source
+- Existing fork/upstream contributor entries are preserved exactly. Oqelith source
   matches the previous local snapshot after repository formatting; the daemon
   repository and current installed app were not changed.
 

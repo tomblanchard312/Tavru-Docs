@@ -76,7 +76,7 @@ pub fn generate_image_cancellable(
     runtime.block_on(async { Client::new(endpoint, app).imagine_with(request, cancellation, &mut on_step).await })
 }
 
-/// Ask Enki for its hardware recommendation without loading weights.
+/// Ask Oqelith for its hardware recommendation without loading weights.
 pub fn recommended_image_profile(app: &str) -> Result<ImageProfile, Error> {
     request_image_profile(app, None)
 }
@@ -87,12 +87,12 @@ pub fn recommended_image_profile_for(app: &str, cpu: bool) -> Result<ImageProfil
 }
 
 fn request_image_profile(app: &str, cpu: Option<bool>) -> Result<ImageProfile, Error> {
-    let endpoint = service_endpoint().ok_or_else(|| Error::Remote("Enki has no endpoint".into()))?;
+    let endpoint = service_endpoint().ok_or_else(|| Error::Remote("Oqelith has no endpoint".into()))?;
     let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build()?;
     runtime.block_on(async {
         match Client::new(endpoint, app).request(Request::ImageDefaults { cpu }, &Cancellation::new()).await? {
             Response::ImageDefaults { profile } => Ok(profile),
-            other => Err(Error::Remote(format!("Enki cannot recommend an image model: {other:?}"))),
+            other => Err(Error::Remote(format!("Oqelith cannot recommend an image model: {other:?}"))),
         }
     })
 }

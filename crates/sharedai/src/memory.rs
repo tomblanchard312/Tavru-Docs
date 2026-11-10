@@ -1,4 +1,4 @@
-//! Scribe's shared user profile and conversation, owned by Enki protocol v3.
+//! Scribe's shared user profile and conversation, owned by Oqelith protocol v3.
 use super::{AtomicBool, Error, Message, Params, Timeouts, chat};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -40,7 +40,7 @@ pub fn append(endpoint: &Path, app: &str, user: &str, assistant: &str) -> Result
 }
 
 impl Memory {
-    /// Recent exchanges are bounded for the model; the complete history stays in Enki until compacted or cleared.
+    /// Recent exchanges are bounded for the model; the complete history stays in Oqelith until compacted or cleared.
     pub fn messages(&self) -> Vec<Message> {
         let mut messages = vec![];
         if !self.preferences.is_empty() || !self.summary.is_empty() {

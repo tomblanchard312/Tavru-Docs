@@ -1,4 +1,4 @@
-//! Download a verified bundle from the installed Enki catalog into the user's models folder.
+//! Download a verified bundle from the installed Oqelith catalog into the user's models folder.
 //!
 //! The download runs only when an app asks for it. Bytes land in `*.part` and are renamed
 //! after the SHA-256 matches, so a partial file is never registered. The VAE and the text
@@ -90,12 +90,12 @@ pub fn download_image_model(model: &str, mut progress: impl FnMut(u64, u64)) -> 
         Err(error) if daemon_unreachable(&error) => false,
         Err(error) => return Err(error),
     };
-    let message = if registered { format!("{model} is ready.") } else { format!("{model} is on disk. Start Enki, then Refresh.") };
+    let message = if registered { format!("{model} is ready.") } else { format!("{model} is on disk. Start Oqelith, then Refresh.") };
     Ok(DownloadReport { model_id: model_id.into(), registered, message })
 }
 
 fn daemon_catalog(model: &str) -> Result<ImageCatalog, Error> {
-    let endpoint = service_endpoint().ok_or_else(|| Error::Remote("Start Enki before downloading a model.".into()))?;
+    let endpoint = service_endpoint().ok_or_else(|| Error::Remote("Start Oqelith before downloading a model.".into()))?;
     let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build()?;
     runtime.block_on(async {
         match Client::new(endpoint, "enki-models").request(Request::ImageCatalog { model: model.into() }, &Cancellation::new()).await? {
@@ -131,7 +131,7 @@ fn validate_catalog(model: &str, manifest: &ImageCatalog) -> Result<(), Error> {
             .all(|role| files.iter().filter(|f| f.role == *role).count() == 1)
         && files.iter().filter(|f| f.role == DefaultImageRole::Diffusion).all(|f| f.relative == format!("{model}.gguf"));
     if !safe {
-        return Err(Error::Remote("Enki supplied an invalid or unpinned image catalog.".into()));
+        return Err(Error::Remote("Oqelith supplied an invalid or unpinned image catalog.".into()));
     }
     Ok(())
 }

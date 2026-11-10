@@ -18,7 +18,7 @@ This product bundles third-party material under its own licenses, listed below. 
 list (author, source, license) is in ATTRIBUTION.md.
 
 - Source Sans 3 and Source Serif 4 (assets/fonts/Source*) — SIL Open Font License 1.1. See assets/fonts/OFL-SourceSans3.txt, OFL-SourceSerif4.txt.
-- Inter (assets/fonts/Inter-*.ttf and eridu-style’s Inter Tabular Regular) — SIL Open Font License 1.1. See assets/fonts/OFL-Inter.txt.
+- Inter (assets/fonts/Inter-*.ttf and the Tavru style dependency’s Inter Tabular Regular) — SIL Open Font License 1.1. See assets/fonts/OFL-Inter.txt.
 - JetBrains Mono (assets/fonts/JetBrainsMono-*.ttf) — SIL Open Font License 1.1. See assets/fonts/OFL-JetBrainsMono.txt.
 - Japanese fonts (craft-fonts): builds made with craft-fonts (CRAFT_FONTS_DIR; all official
   releases) embed the fonts listed in
@@ -136,14 +136,14 @@ Complete native distributions include a self-contained .NET runtime and Roslyn c
 Their versioned licence and third-party notice files are preserved under runtimes/vba/notices;
 the runtime manifest records the target and bundled component paths.
 
-Enki client/protocol snapshot
+Oqelith client/protocol snapshot
 -----------------------------
 The sources under vendor/enki-client and vendor/enki-protocol originate from
 tomblanchard312/Oqelith. They retain their existing UNLICENSED designation and are not
 relicensed under the application's MIT OR Apache-2.0 terms. See vendor/README.md for
 the source revision and snapshot scope. No new license grant is made by this notice.
 
-Enki shared SDK (client, protocol and speech controls)
+Oqelith shared SDK (client, protocol and speech controls)
 ======================================================
 
 MIT License
@@ -235,13 +235,13 @@ of Data, including for example machine learning models and models'
 insights.
 
 
-Enki companion runtime (applies only when its binaries are distributed):
+Oqelith companion runtime (applies only when its binaries are distributed):
 
-Enki Runtime Binary Distribution License
+Oqelith Runtime Binary Distribution License
 Copyright (c) 2026 tomblanchard312
 
 Permission is granted, worldwide, perpetually, non-exclusively and royalty-free,
-to use, copy and redistribute official compiled Enki daemon and inference-worker
+to use, copy and redistribute official compiled Oqelith daemon and inference-worker
 binaries supplied by tomblanchard312, including their accompanying installation
 and launch helpers, as part of, or as a companion runtime for, applications
 maintained or distributed by tomblanchard312. This permission includes commercial
@@ -255,14 +255,14 @@ but may not change the functionality of the compiled first-party binaries under
 this grant. This license does not require publication of application source code.
 
 This is a binary distribution grant, not a source-code license. No permission is
-granted to publish or redistribute the private Enki daemon or worker implementation
+granted to publish or redistribute the private Oqelith daemon or worker implementation
 source code. Ownership remains with its respective copyright holders. All rights
 not expressly granted are reserved.
 
 The MIT licenses of sharedai-client, sharedai-protocol and enki-speech-ui remain
 unchanged. Third-party software and model files remain governed by their own
 licenses; this grant neither replaces nor limits those licenses. Model weights
-are not included in this grant. Enki branding remains subject to the separate
+are not included in this grant. Oqelith branding remains subject to the separate
 branding license; this grant conveys no additional trademark rights.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -296,9 +296,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Eridu icon supplement (ribbon)
+Tavru icon supplement (ribbon)
 
-Copyright (c) Eridu OS project. The supplement is under the MIT License
+Copyright (c) TavruOS project. The supplement is under the MIT License
 printed above.
 
 Assistant branding
@@ -306,5 +306,5 @@ Assistant branding
 The canonical Oqelith assistant mark is sourced from the TavruOS project.
 Source export SHA-256: 04dec495f340f0ab7b2bd5220575c12939544c02e30a10bb7a2e35b3132979fd.
 Concept approval does not establish production trademark or copyright clearance.
-See ATTRIBUTION.md. The earlier Enki artwork is no longer embedded; the runtime
+See ATTRIBUTION.md. The earlier assistant artwork is no longer embedded; the runtime
 and SDK licensing notices above remain applicable to their respective components.

@@ -67,7 +67,7 @@ pub fn user_models_dir() -> Option<std::path::PathBuf> {
     base.filter(|b| b.is_absolute()).map(|b| b.join("SharedAI").join("models"))
 }
 
-/// Curated image recommendations. Updating Enki updates this catalog; older bundles stay on disk.
+/// Curated image recommendations. Updating Oqelith updates this catalog; older bundles stay on disk.
 #[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ImageProfile {
     pub model: String,

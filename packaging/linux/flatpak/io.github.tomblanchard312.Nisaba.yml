@@ -44,8 +44,8 @@ finish-args:
   - --filesystem=xdg-pictures
   # Models downloaded or added by the user, matching the native per-user model folder.
   - --filesystem=xdg-data/nisaba
-  # Shared Enki on the host. The launcher installs or updates it and uses its socket.
-  # A newer Enki already installed is left as it is.
+  # Shared Oqelith on the host. The launcher installs or updates it and uses its socket.
+  # A newer Oqelith already installed is left as it is.
   - --filesystem=xdg-data/enki:create
   - --filesystem=xdg-data/SharedAI:create
   - --filesystem=xdg-run/sharedai:create
@@ -115,8 +115,8 @@ modules:
       - mkdir -p /app/lib/wordcraft && cp -R packaged-runtimes /app/lib/wordcraft/runtimes
       - cargo --offline build --release --locked -p wordcraft -p wordcraft-cli
       - install -Dm755 target/release/wordcraft /app/bin/nisaba-bin
-      # The release bundle copies Enki into /app/lib/enki-payload. This from-source build does not
-      # compile Enki; the launcher runs Qanloom, and installs Enki when that payload is present.
+      # The release bundle copies Oqelith into /app/lib/enki-payload. This from-source build does not
+      # compile Oqelith; the launcher runs Qanloom, and installs Oqelith when that payload is present.
       - install -Dm755 packaging/linux/enki-flatpak-launch.sh /app/bin/nisaba
       - install -Dm755 target/release/wordcraft-cli /app/bin/nisaba-cli
       - install -Dm644 packaging/linux/io.github.tomblanchard312.Nisaba.desktop /app/share/applications/io.github.tomblanchard312.Nisaba.desktop

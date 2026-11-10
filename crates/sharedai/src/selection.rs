@@ -1,5 +1,5 @@
-/// Select an installed Enki text model for a task without exposing model details in the UI.
-/// shortcut: until Enki advertises task capabilities, rank registered text model families.
+/// Select an installed Oqelith text model for a task without exposing model details in the UI.
+/// shortcut: until Oqelith advertises task capabilities, rank registered text model families.
 pub fn select_text_model(models: &[String], task: &str) -> Option<String> {
     models
         .iter()

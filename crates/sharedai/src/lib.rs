@@ -1,4 +1,4 @@
-//! A small, blocking client for the Enki daemon (`sharedai-daemon`): list its models and stream a
+//! A small, blocking client for the Oqelith daemon (`sharedai-daemon`): list its models and stream a
 //! chat reply. Qanloom does not link llama.cpp; the daemon's worker does.
 //!
 //! SharedAI runs models on the user's own machine. Its wire contract (docs/INFERENCE.md there) is
@@ -306,7 +306,7 @@ pub fn model_id(path: &std::path::Path) -> String {
     if id.is_empty() { "model".into() } else { id }
 }
 
-/// Chat with the GGUF file at `path` through the Enki daemon.
+/// Chat with the GGUF file at `path` through the Oqelith daemon.
 ///
 /// Starts `sharedai-daemon` when nothing is listening, registers the file, and streams the reply.
 /// A catalog model is refused when its bytes do not match the pinned checksum. The file path is
@@ -664,7 +664,7 @@ pub fn available_text_models() -> Result<Vec<String>, Error> {
     let models = list_models(&endpoint, "nisaba")?;
     Ok(models.into_iter().filter(|id| select_text_model(std::slice::from_ref(id), "writing").is_some()).collect())
 }
-/// Route a writing or code request through Enki using the installed model appropriate to it.
+/// Route a writing or code request through Oqelith using the installed model appropriate to it.
 pub fn chat_auto(task: &str, messages: &[Message], params: &Params, cancel: &AtomicBool, on_chunk: impl FnMut(&str)) -> Result<Summary, Error> {
     if cancel.load(Ordering::Relaxed) {
         return Err(Error::Cancelled);
