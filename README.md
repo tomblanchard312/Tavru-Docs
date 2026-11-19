@@ -17,6 +17,10 @@ format documents, review tracked changes, and export finished work to PDF.
   [Developer workspace](docs/vba-editor.md). Running supported macros requires
   the [optional .NET runtime setup](vba/README.md). Run only macros you trust.
 
+![Tavru Docs home page with document templates](docs/images/tavru-mvp-vm.png)
+
+*Captured from an installed TavruOS MVP in a disposable VM.*
+
 ## Build and run
 
 With Rust and Cargo installed, run these commands from the repository root:
