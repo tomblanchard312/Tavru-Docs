@@ -4,7 +4,7 @@
 
 > **Portal reliability update (2026-11-08)** · Optional Ninimma picking requires an explicit protocol advertisement; immediate native cancellation is final. See [phase 0 portal scope and remaining gates](docs/PHASE0-PORTALS.md). Native release acceptance and readiness estimates remain unchanged.
 
-> **Eridu UI update (2026-11-05)** · Qanloom adopts shared Eridu light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the Eridu supplement. The writing assistant is now Enki, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
+> **Workspace UI update (2026-11-05)** · Tavru Docs adopts shared light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the shared icon supplement. The writing assistant is now Enki, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
 
 > **Scribe navigation: 2026-10-30** · The branded Scribe button is always available in the top bar, independent of the selected ribbon tab. The Review shortcut is removed; existing assistant behavior is unchanged.
 
@@ -171,7 +171,7 @@ Ranked, to beta (detail and remaining milestones in [docs/roadmap.md](docs/roadm
 
 ## Progress log
 
-> 2026-11-05 · Eridu workspace styling adopted.
+> 2026-11-05 · Shared workspace styling adopted.
 
 - 2026-10-28: Aligned-copy review fixes keep the document axis locked through middle-button scrolling and let Ctrl/Command+Shift start on a secondary selected object. Plain Ctrl and Shift clicks keep their existing behavior (#4764).
 
@@ -724,7 +724,7 @@ Footer page-table height and body wrapping are corrected. Other pagination gaps 
 
 ## Revision history
 
-> 2026-11-05 · Recorded Eridu workspace styling and remaining acceptance checks.
+> 2026-11-05 · Recorded shared workspace styling and remaining acceptance checks.
 
 > 2026-10-28 · Markdown import bounds reference-label scans and normalization within the existing link-work allowance. Nested undefined labels preserve literal text instead of causing quadratic work (#4658).
 >
