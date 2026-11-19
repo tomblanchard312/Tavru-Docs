@@ -1,12 +1,12 @@
 # Ask, the local writing assistant
 
-> **Last updated:** 2026-11-05 · **Change:** Renamed Oqelith to Oqelith and adopted the Eridu chat styling.
+> **Last updated:** 2026-11-05 · **Change:** Adopted the shared chat styling for Ask.
 
 Oqelith runs writing requests on this computer through the local Oqelith daemon (`sharedai-daemon`). It suggests rewrites and new text that can be applied as tracked changes. The title bar and writing pane use the official folded blue E. See [asset attribution](../ATTRIBUTION.md).
 
 ## Using it
 
-1. Choose **Oqelith** in the title bar. The first time, Qanloom lists its local model files in the background ("Starting Oqelith…").
+1. Choose **Ask** in the title bar. The first time, Qanloom lists its local model files in the background ("Starting Oqelith…").
 2. With no model yet, the pane says that the local assistant needs text-generation setup. In **Settings**, choose **Download Phi-4 mini** (about 2.5 GB, MIT). That is the default. Qanloom checks the pinned SHA-256 and keeps the file in its models folder (`~/.local/share/nisaba/models`, private to the user), then selects it. **Choose Model File…** and the other catalog models under **Settings** are still available. If Phi-4 mini is already there, Oqelith selects it ahead of other files unless a model was chosen already.
 3. Select some text and choose **Improve**, **Shorten**, **Fix grammar** or **More formal**, or type a request and choose **Send** (Ctrl+Enter, or Cmd+Enter on macOS). **Continue** writes a concise next paragraph after the selection, or uses text before the document caret when nothing is selected. On an empty body paragraph it can use the previous paragraph.
 4. The final answer streams into the pane; internal reasoning prefixes are withheld. **Stop** ends generation. Stopped, failed, empty or length-limited results cannot be applied; visible draft text can still be copied.

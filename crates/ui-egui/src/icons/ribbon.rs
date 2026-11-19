@@ -1,4 +1,4 @@
-//! Ribbon command artwork from the Eridu Phosphor and supplement families.
+//! Ribbon command artwork from the shared Phosphor and icon supplement families.
 
 use egui::{Align2, Color32, FontId, Painter, Rect};
 use eridu_style::{extra, fonts, glyph};
