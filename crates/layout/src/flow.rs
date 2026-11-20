@@ -895,6 +895,7 @@ fn next_first_line(ctx: &mut Ctx, block: usize, width: f32, depth: usize, counte
                         hide_deleted: ctx.opts.hides_deleted(StoryRef::Body),
                         table: None,
                         proofing: None,
+                        defer_proofing: false,
                         typing_word: None,
                         numeral: ctx.opts.numeral,
                         exclusions: &[],

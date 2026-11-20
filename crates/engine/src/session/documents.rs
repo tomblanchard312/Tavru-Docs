@@ -257,6 +257,7 @@ impl Session {
             ui_requests: _,
             read_aloud: _,
             prefs: _,
+            defer_proofing: _,
             system_region: _,
             keymap: _,
             ribbon: _,

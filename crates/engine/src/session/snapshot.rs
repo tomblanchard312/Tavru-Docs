@@ -137,6 +137,7 @@ impl Session {
             ime_origin: _,
             read_aloud: _,
             prefs: _,
+            defer_proofing: _,
             system_region: _,
             keymap: _,
             ribbon: _,

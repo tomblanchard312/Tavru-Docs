@@ -2,15 +2,15 @@
 
 [TavruOS interface design brief](docs/TAVRUOS-UI.md) · shared purple workspace styling
 
-> **Product name:** Tavru Docs (formerly Qanloom, DraftHearth, Nisaba). Existing application IDs, settings directories, command names and repository URLs remain compatible.
+> **Product name:** Tavru Docs. Earlier public names were Qanloom, DraftHearth and Nisaba. Repository: [github.com/tomblanchard312/Tavru-Docs](https://github.com/tomblanchard312/Tavru-Docs).
 
-<p align="center"><img src="assets/app-icon/nisaba-logo.png" width="460" alt="Qanloom: blue document and gold writing stylus"></p>
+<p align="center"><img src="assets/app-icon/nisaba-logo.png" width="460" alt="Tavru Docs: blue document and gold writing stylus"></p>
 
 **A fast, open-source word processor written in Rust, for documents, writing and design.** The
 ribbon, styles, tables, track changes, references and mail merge; it reads and writes .docx, opens
 .odt, .rtf, .html, .md and .txt, exports PDF, and can be driven by AI agents over MCP.
 
-Qanloom is a fork of [WordCraft](https://github.com/storytold/wordcraft) by the ArtCraft team and
+Tavru Docs is a fork of [WordCraft](https://github.com/storytold/wordcraft) by the ArtCraft team and
 community. It follows WordCraft closely and adds what a desktop built around local AI needs:
 
 - **Oqelith, a built-in local writing assistant**: improve, shorten, correct grammar, adjust tone or
@@ -18,13 +18,16 @@ community. It follows WordCraft closely and adds what a desktop built around loc
   your computer. Suggestions become tracked changes you accept or reject.
 - **A side-by-side VBA workspace**: edit modules, inspect the document model, place form controls,
   ask for coding help and review local code-completion suggestions. The optional .NET runtime
-  executes supported macros against Qanloom's command protocol.
+  executes supported macros against Tavru Docs's command protocol.
 - **A FreeBSD and KDE Plasma home**: packaging and defaults for a FreeBSD desktop distribution,
   alongside the Linux, macOS, Windows and web builds WordCraft already has.
 
-Qanloom keeps WordCraft's internal names (crates, commands, environment variables) so upstream
-improvements merge cleanly; the product's name, app id and settings folders come from
-[`crates/brand`](crates/brand/src/lib.rs).
+Tavru Docs keeps WordCraft's internal names (crates, commands, environment variables) so upstream
+improvements merge cleanly. The name people see comes from
+[`crates/brand`](crates/brand/src/lib.rs). The installed programs are still `nisaba` and
+`nisaba-cli`. Settings stay in `~/.config/nisaba` (macOS `~/Library/Application Support/Nisaba`,
+Windows `%APPDATA%\Nisaba`). The application id is still `io.github.tomblanchard312.Nisaba`.
+The brand crate's homepage constant still points at the previous Qanloom repository URL.
 
 ## Build and run
 
@@ -33,16 +36,15 @@ cargo run --release -p wordcraft -- --sample          # the desktop app with the
 cargo run --release -p wordcraft-cli -- convert in.docx out.pdf
 ```
 
-Packages install the programs as `nisaba` and `nisaba-cli`. Settings live in `~/.config/nisaba`
-(macOS `~/Library/Application Support/Nisaba`, Windows `%APPDATA%\Nisaba`), separate from an
-installed WordCraft. **Help › Check for Updates** links to Qanloom releases; automatic updates
-are currently disabled while the upstream installer is adapted to Qanloom’s package identity.
+Settings are separate from an installed WordCraft. **Help › Check for Updates** still follows the
+brand homepage. Automatic updates are disabled while the upstream installer is adapted to this
+fork's package identity.
 
 ## Write with Oqelith
 
 1. Open **Ask** in the title bar. Under **Settings**, download a catalog model or choose a compatible
    local GGUF file. Downloads require internet access; inference runs locally through the Oqelith
-   daemon, which Qanloom starts when needed.
+   daemon, which Tavru Docs starts when needed.
 2. Select text and choose **Improve**, **Shorten**, **Fix grammar** or **More formal**, or enter
    your own request. **Continue** can also use the text before the caret when nothing is selected.
 3. Review the suggestion, then **Replace** or **Insert** it. Accept or reject the resulting edits
@@ -86,15 +88,16 @@ format and parity documentation is in [docs/](docs/).
 ## License and credits
 
 The vendored Oqelith client/protocol snapshot retains its existing `UNLICENSED` designation;
-Qanloom's license does not grant rights to that code. See [snapshot provenance](vendor/README.md).
+this product's license does not grant rights to that code. See [snapshot provenance](vendor/README.md).
 
 MIT OR Apache-2.0, at your option. WordCraft is copyright (c) 2026 ArtCraft Team and the WordCraft
-contributors; Nisaba's changes are copyright (c) 2026 Tom Blanchard. See [NOTICE](NOTICE) and
-[ATTRIBUTION.md](ATTRIBUTION.md) for bundled material. Qanloom is not made, sponsored or endorsed by
-the ArtCraft Team, and contains none of the ArtCraft marks.
+contributors. Fork changes are copyright (c) 2026 Tom Blanchard; the copyright line in
+`crates/brand` still records those changes under the earlier Qanloom, DraftHearth and Nisaba names.
+See [NOTICE](NOTICE) and [ATTRIBUTION.md](ATTRIBUTION.md) for bundled material. Tavru Docs is not
+made, sponsored or endorsed by the ArtCraft Team, and contains none of the ArtCraft marks.
 
-The Qanloom icon is original blue-and-gold document-and-stylus artwork. The name is
-inspired by Mesopotamian reed-stylus writing; it is a modern coined name, not a deity.
-Existing icon filenames and operating-system IDs are retained for upgrade compatibility.
+The icon file is still `nisaba-logo.png`: the existing blue-and-gold document-and-stylus artwork.
+Icon filenames and operating-system IDs stay as they are so upgrades keep working. See
+[product identity](docs/product-name.md).
 
 Voice accessibility preview: see [dictation, transcription, translation and safe voice controls](docs/VOICE.md).

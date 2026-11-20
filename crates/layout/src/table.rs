@@ -208,6 +208,7 @@ pub fn measure_table_columns(doc: &wordcraft_doc::Document, t: &Table) -> Vec<(f
                 hide_deleted: Default::default(),
                 table: text.as_ref(),
                 proofing: None,
+                defer_proofing: false,
                 typing_word: None,
                 // Measurement uses a fixed environment (like show_hidden/proofing above).
                 numeral: crate::NumeralMode::default(),

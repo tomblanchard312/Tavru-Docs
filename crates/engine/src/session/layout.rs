@@ -63,6 +63,7 @@ impl Session {
             hide_marked: deleted.1,
             deletions_in_balloons: deleted.2,
             proofing: self.view.proofing,
+            defer_proofing: self.defer_proofing,
             numeral: self.view.numeral.resolve(SYSTEM_LOCALE.get().map(String::as_str)),
             comment_balloons: false,
             field_codes: shown.1,
@@ -141,6 +142,7 @@ impl Session {
         copy.last_highlight = self.last_highlight;
         copy.system_region = self.system_region.clone();
         copy.editing_lang = self.editing_lang.clone();
+        copy.defer_proofing = self.defer_proofing;
         // The copy shares the paragraph layouts, so only what the command changed is laid out.
         std::mem::swap(&mut copy.cache, &mut self.cache);
         let layout = copy.run(id, params).is_ok().then(|| {

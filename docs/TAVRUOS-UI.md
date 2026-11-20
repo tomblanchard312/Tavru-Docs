@@ -1,4 +1,4 @@
-# Qanloom TavruOS interface
+# Tavru Docs interface
 
 Updated 2026-11-09. Audience: people writing, reviewing and exchanging documents.
 

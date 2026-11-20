@@ -184,6 +184,9 @@ pub struct Session {
     pub read_aloud: crate::speech::ReadAloud,
     /// Preferences the front end saves between runs.
     pub prefs: Prefs,
+    /// Spellcheck the laid-out page on a background thread so the window can paint first (#3613).
+    /// Headless sessions and tests leave this off and read the marks from the layout immediately.
+    pub defer_proofing: bool,
     /// The system region (#838): the paper a new blank document starts on, the default
     /// measurement unit and the decimal separator. The front end sets it from the platform (the
     /// browser's locale on the web); headless sessions keep `en-US`. A region the user chose

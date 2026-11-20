@@ -4,7 +4,7 @@
 
 > **Portal reliability update (2026-11-08)** · Initial E02 fixes cover picker capability detection and final cancellation. [Backend response distinction, timeout, restart and native round-trip acceptance remain open](PHASE0-PORTALS.md). Existing priorities and readiness estimates remain unchanged.
 
-> **Eridu UI update (2026-11-05)** · Qanloom adopts shared Eridu light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the Eridu supplement. The writing assistant is now Oqelith, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
+> **Workspace UI update (2026-11-05)** · Tavru Docs adopts shared light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the shared icon supplement. The writing assistant is now Oqelith, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
 
 > **Integration update: 2026-10-30** · Integrated 54 upstream commits through `5b5810fe`, preserving Qanloom branding, Oqelith, Scribe, VBA and runtime packaging. ZIP and Tokio advisories are patched; see [integration evidence](upstream-sync.md). Platform readiness estimates are unchanged.
 
@@ -161,7 +161,7 @@ Recipient label generation (#4880) now includes all selected recipients across a
 
 ## Revision history
 
-> 2026-11-05 · Recorded Eridu workspace styling and remaining acceptance checks.
+> 2026-11-05 · Recorded shared workspace styling and remaining acceptance checks.
 
 > 2026-10-26: Scribe uses its approved original blue S/reed-tip artwork in the Review ribbon and pane; embedded locally, attributed and checked in light/dark headless renders. Readiness estimates unchanged.
 

@@ -4,7 +4,7 @@
 
 > **Portal reliability update (2026-11-08)** · Picker capability detection and cancellation semantics are hardened; [native portal failure and timeout gates remain open](PHASE0-PORTALS.md). No readiness percentage changes.
 
-> **Eridu UI update (2026-11-05)** · Qanloom adopts shared Eridu light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the Eridu supplement. The writing assistant is now Oqelith, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. File page headings use Inter Semibold at the Eridu page-title size to respect the repository rule on Adobe assets. Full Eridu accessibility and platform acceptance remain open.
+> **Workspace UI update (2026-11-05)** · Tavru Docs adopts shared light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the shared icon supplement. The writing assistant is now Oqelith, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. File page headings use Inter Semibold at the Eridu page-title size to respect the repository rule on Adobe assets. Full Eridu accessibility and platform acceptance remain open.
 
 > **Runtime integration: 2026-10-30** · Native packages and local installs must retain the complete VBA runtime/compiler and its notices. Portable script packages are checked for required dependencies; Linux system packages declare their scripting dependencies. Native Linux smoke checks are separate from foreign-platform packaging checks. See [runtime packaging](scripting-runtimes.md).
 
@@ -100,7 +100,7 @@ Labels → New Document with “One label per recipient” includes all filtered
 
 ## Revision history
 
-> 2026-11-05 · Recorded Eridu workspace styling and remaining acceptance checks.
+> 2026-11-05 · Recorded shared workspace styling and remaining acceptance checks.
 
 > 2026-10-26: Scribe uses its approved original blue S/reed-tip artwork in the Review ribbon and pane; embedded locally, attributed and checked in light/dark headless renders. Readiness estimates unchanged.
 

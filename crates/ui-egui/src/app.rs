@@ -27,6 +27,15 @@ impl WordApp {
     /// services, printing, canvas, dialogs, previews, control and screenshot state, font and theme
     /// tracking.
     pub fn new(session: Session, services: Services) -> Self {
+        // The window lays the page out on this thread. Dictionary checks continue in the
+        // background and the next frame draws the squiggles (#3613). The web build has no
+        // worker thread, so it keeps the inline check.
+        #[cfg(not(target_arch = "wasm32"))]
+        let session = {
+            let mut session = session;
+            session.defer_proofing = true;
+            session
+        };
         // Numeral › System follows the system locale, found here rather than in layout.
         if let Some(tag) = sys_locale::get_locale() {
             wordcraft_engine::set_system_locale(&tag);
@@ -446,6 +455,11 @@ impl WordApp {
         }
         #[cfg(not(target_arch = "wasm32"))]
         crate::speech::show(self, &ctx);
+        // Squiggles arrive after this frame's layout. Keep painting until the checker is idle.
+        #[cfg(not(target_arch = "wasm32"))]
+        if self.session.defer_proofing && wordcraft_engine::layout::proof_busy() {
+            ctx.request_repaint_after(std::time::Duration::from_millis(32));
+        }
         // The synthetic step this frame took is done even when drawing ended early.
         self.flush_shot_and_synthetic(&ctx);
     }

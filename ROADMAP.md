@@ -4,11 +4,11 @@
 
 > **Portal reliability update (2026-11-08)** · Optional Ninimma picking requires an explicit protocol advertisement; immediate native cancellation is final. See [phase 0 portal scope and remaining gates](docs/PHASE0-PORTALS.md). Native release acceptance and readiness estimates remain unchanged.
 
-> **Eridu UI update (2026-11-05)** · Qanloom adopts shared Eridu light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the Eridu supplement. The writing assistant is now Oqelith, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
+> **Workspace UI update (2026-11-05)** · Tavru Docs adopts shared light and dark colors, typography and spacing in the editor and File workspace. The File sidebar and ribbon commands use Phosphor and the shared icon supplement. The writing assistant is now Oqelith, with the official mark and Eridu chat controls. The ribbon remains the primary editing toolbar. Full Eridu accessibility and platform acceptance remain open.
 
 > **Scribe navigation: 2026-10-30** · The branded Scribe button is always available in the top bar, independent of the selected ribbon tab. The Review shortcut is removed; existing assistant behavior is unchanged.
 
-> **Qanloom rename: 2026-10-30** · DraftHearth is now Qanloom. Product UI, exports, package display names, wordmark, installer artwork and project links use Qanloom. Stable application/settings/upgrade identities and upstream attribution are retained. See [product identity](docs/product-name.md).
+> **Public name: Tavru Docs.** Qanloom was the name from 2026-10-30 until the Tavru suite rename. DraftHearth and Nisaba are earlier names. Stable application, settings and upgrade identities, and upstream attribution, are retained. See [product identity](docs/product-name.md).
 
 
 > **Integration update: 2026-10-30** · Integrated 54 upstream commits through `5b5810fe`, preserving Qanloom branding, Oqelith, Scribe, VBA and runtime packaging. ZIP and Tokio advisories are patched; see [integration evidence](docs/upstream-sync.md). Platform readiness estimates are unchanged.
@@ -171,7 +171,7 @@ Ranked, to beta (detail and remaining milestones in [docs/roadmap.md](docs/roadm
 
 ## Progress log
 
-> 2026-11-05 · Eridu workspace styling adopted.
+> 2026-11-05 · shared workspace styling adopted.
 
 - 2026-10-28: Aligned-copy review fixes keep the document axis locked through middle-button scrolling and let Ctrl/Command+Shift start on a secondary selected object. Plain Ctrl and Shift clicks keep their existing behavior (#4764).
 
@@ -724,7 +724,7 @@ Footer page-table height and body wrapping are corrected. Other pagination gaps 
 
 ## Revision history
 
-> 2026-11-05 · Recorded Eridu workspace styling and remaining acceptance checks.
+> 2026-11-05 · Recorded shared workspace styling and remaining acceptance checks.
 
 > 2026-10-28 · Markdown import bounds reference-label scans and normalization within the existing link-work allowance. Nested undefined labels preserve literal text instead of causing quadratic work (#4658).
 >

@@ -17,6 +17,7 @@ pub mod kinsoku;
 pub mod math;
 pub mod outline;
 pub mod para;
+mod proof_bg;
 pub mod styleref;
 mod table;
 mod textbox;
@@ -75,6 +76,7 @@ use page::item_bottom;
 use pass::layout_pass;
 pub use pass::now_ms;
 pub use placed::{HfSlot, Placed, turn_point, turn_rect, unturn_point};
+pub use proof_bg::{IssueMarks, proof_busy};
 
 /// How the document is viewed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
@@ -190,6 +192,9 @@ pub struct LayoutOptions {
     pub deletions_in_balloons: bool,
     /// Check spelling as you type (squiggles).
     pub proofing: bool,
+    /// Compute those squiggles on a background thread. The layout returns before the dictionary
+    /// check finishes; the marks appear on a later frame (#3613).
+    pub defer_proofing: bool,
     /// How digits look on screen (display only; the text is untouched). Callers resolve
     /// `System` ([`NumeralMode::resolve`]); an unresolved `System` shows Western digits.
     pub numeral: NumeralMode,

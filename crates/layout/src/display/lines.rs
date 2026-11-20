@@ -612,7 +612,9 @@ fn inline_objects(ctx: &LineContext<'_, '_, '_>, out: &mut Vec<Draw>) {
 }
 
 fn proofing_marks(ctx: &LineContext<'_, '_, '_>, out: &mut Vec<Draw>) {
-    for (start, end, grammar) in &ctx.pl.issues {
+    let deferred = ctx.pl.issue_slot.as_ref().map(|slot| slot.snapshot());
+    let issues = deferred.as_deref().unwrap_or(&ctx.pl.issues);
+    for (start, end, grammar) in issues {
         if *end <= ctx.line.start || *start >= ctx.line.stop {
             continue;
         }

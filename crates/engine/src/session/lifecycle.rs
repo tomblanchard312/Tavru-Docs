@@ -150,6 +150,7 @@ impl Session {
             math_normal_text: false,
             also_selected,
             prefs: Prefs::default(),
+            defer_proofing: false,
             system_region: Default::default(),
             keymap: crate::KeyMap::default(),
             ribbon: crate::RibbonLayout::default(),

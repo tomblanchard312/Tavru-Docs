@@ -2,6 +2,7 @@ use crate::WordApp;
 use enki_speech_ui::{Action, VoiceCommand};
 use serde_json::json;
 pub(crate) fn show(app: &mut WordApp, ctx: &egui::Context) {
+    launch_daemon(app.speech.open);
     let scope = format!("{}:{}:{:?}", app.session.document_id(), app.session.ime_body_epoch(), app.session.sel);
     let Some(action) = app.speech.show(ctx, &scope, "Insert into document") else { return };
     let result = match action {
@@ -32,4 +33,19 @@ pub(crate) fn show(app: &mut WordApp, ctx: &egui::Context) {
     if let Err(e) = result {
         app.status_msg = Some((e.to_string(), ctx.input(|i| i.time)));
     }
+}
+
+fn launch_daemon(open: bool) {
+    if !open {
+        return;
+    }
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static STARTED: AtomicBool = AtomicBool::new(false);
+    if STARTED.swap(true, Ordering::Relaxed) {
+        return;
+    }
+    let _ = std::thread::Builder::new().name("sharedai-launch".into()).spawn(|| {
+        let Ok(endpoint) = wordcraft_sharedai::endpoint("") else { return };
+        let _ = wordcraft_sharedai::ensure_running(&endpoint, Some(&endpoint));
+    });
 }

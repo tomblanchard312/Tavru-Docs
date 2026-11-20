@@ -370,6 +370,8 @@ pub struct ParaEnv<'a> {
     pub table: Option<&'a CellText>,
     /// Check spelling (and grammar, as the options say) for squiggles; `None` = no squiggles.
     pub proofing: Option<crate::ProofOptions>,
+    /// Hand the dictionary check to the proofing thread instead of running it here.
+    pub defer_proofing: bool,
     /// The byte range of the word being typed in this paragraph: it gets no spelling squiggle
     /// until the caret leaves it ([`crate::LayoutOptions::typing_word`]).
     pub typing_word: Option<(usize, usize)>,

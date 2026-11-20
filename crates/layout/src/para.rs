@@ -62,8 +62,12 @@ pub struct ParaLayout {
     pub has_page_fields: bool,
     /// Note references (part id) in this paragraph, by cluster index.
     pub notes: Vec<(usize, u32)>,
-    /// Proofing issues: (byte start, byte end, grammar?).
+    /// Proofing issues: (byte start, byte end, grammar?). Empty when [`Self::issue_slot`] is
+    /// still being filled on the proofing thread.
     pub issues: Vec<(usize, usize, bool)>,
+    /// Deferred proofing marks (#3613). `None` when the check ran inline and [`Self::issues`]
+    /// already holds the result.
+    pub issue_slot: Option<Arc<crate::IssueMarks>>,
     /// Drop cap: (clusters at the start that form it, lines it drops, the indent of those lines:
     /// the letter's width and its distance from the text, or 0 in the margin).
     pub drop_cap: Option<(usize, u8, f32)>,
@@ -330,6 +334,7 @@ mod label_spacing_tests {
             hide_deleted: Default::default(),
             table: None,
             proofing: None,
+            defer_proofing: false,
             typing_word: None,
             field_codes: false,
             grid: Grid::default(),
